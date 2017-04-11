@@ -1,4 +1,6 @@
-// inits things like config, modules, and other stuff
+// initialize basic operations such as config, logger, etc.
+
+require('./CoreUtils.js');
 
 // config loading
 new Promise((resolve, reject) => {
@@ -6,7 +8,7 @@ new Promise((resolve, reject) => {
 	try {
 		result = fs.readFileSync(__dirname + '/../cfg/config.json', 'utf8');
 	} catch(er) {
-		return reject('Failed to access config file. Please ensure config.json exists and is accessible you fucking idiot.');
+		return reject(new Error('Failed to access config file. Please ensure config.json exists and is accessible you fucking idiot.'));
 	}
 		
 	global.Config = JSON.parse(result);
@@ -34,6 +36,6 @@ new Promise((resolve, reject) => {
 	});
 	logger.debug('Winston initialized!');
 })).catch(err => {	// error doing something
-	console.error(`Init error: ${(err.stack||err)}`);
-	process.exit(1);
-});
+	console.error(`Init error: ${err.stack}`);
+	exit(1);
+}).then(require('./stop-it.js').botStart);
