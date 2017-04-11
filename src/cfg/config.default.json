@@ -1,9 +1,24 @@
 {
+	"Discord": {
+		"Token": "my-authentication-key-here",
+		"Prefix": {
+			"Prefixes": [">>", "!", ">", "^"],
+			"Mention": true
+		}
+	},
 	"Logging": {
 		"Level": "warn",
 		"Prefix": "stop-it-bot-",
 		"DatePattern": "yyyy-M-d",
 		"Container": "logs",
 		"JSON": false
+	},
+	"MySQL": {
+		"Hostname": "database.example.com",
+		"Authentication": {
+			"User": "mydbuser",
+			"Password": "mypassword"
+		},
+		"Database": "stop-it"
 	}
 }
