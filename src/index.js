@@ -1,6 +1,13 @@
-// stop-it bot for discord
+// stop-it bot for discord - using discord.js
 // copyright 2017 hayden andreyka - technoguyfication(.com) <haydenandreyka@gmail.com>
 // all rights are implied under the absence of a formal open source software license
+
+global.AppInfo = {
+	Name: "stop-it",
+	Version: "1.0.0",
+	Author: "Hayden Andreyka <haydenandreyka@gmail.com>",
+	Url: "https://technoguyfication.com/"
+};
 
 try {
 	global.fs = require('fs');
