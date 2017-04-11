@@ -22,4 +22,3 @@ CREATE TABLE IF NOT EXISTS `users` (
 	`apicalls` INT	-- number of api calls they've caused to happen
 	
 );
-
