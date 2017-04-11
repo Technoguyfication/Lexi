@@ -1,0 +1,9 @@
+{
+	"Logging": {
+		"Level": "warn",
+		"Prefix": "stop-it-bot-",
+		"DatePattern": "yyyy-M-d",
+		"Container": "logs",
+		"JSON": false
+	}
+}

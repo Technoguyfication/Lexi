@@ -5,6 +5,10 @@
 try {
 	global.fs = require('fs');
 	global.util = require('util');
+	global.path = require('path');
+	
+	global.winston = require('winston');
+	global.wdrf = require('winston-daily-rotate-file');
 } catch(er) {
 	console.error(`Fatal error loading dependencies:\n\n${er.stack}`);
 	process.exit(1);
