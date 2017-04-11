@@ -16,6 +16,7 @@ try {
 	
 	global.winston = require('winston');
 	global.wdrf = require('winston-daily-rotate-file');
+	global.Discord = require('discord.js');
 } catch(er) {
 	console.error(`Fatal error loading dependencies:\n\n${er.stack}`);
 	process.exit(1);

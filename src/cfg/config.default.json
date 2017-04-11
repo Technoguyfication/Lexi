@@ -4,10 +4,16 @@
 		"Prefix": {
 			"Prefixes": [">>", "!", ">", "^"],
 			"Mention": true
+		},
+		"ClientOptions": {
+			"fetchAllMembers": true,
+			"ws": {
+				"large_threshold": 50
+			}
 		}
 	},
 	"Logging": {
-		"Level": "warn",
+		"Level": "info",
 		"Prefix": "stop-it-bot-",
 		"DatePattern": "yyyy-M-d",
 		"Container": "logs",
