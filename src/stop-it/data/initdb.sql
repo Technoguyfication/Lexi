@@ -23,6 +23,13 @@ CREATE TABLE IF NOT EXISTS `users` (
 	PRIMARY KEY (`id`)
 );
 
+-- moderators table
+CREATE TABLE IF NOT EXISTS `moderators` (
+	`serverid` VARCHAR(25) NOT NULL,
+	`userid` VARCHAR(25) NOT NULL,
+	PRIMARY KEY (`serverid`)
+);
+
 -- stats table
 CREATE TABLE IF NOT EXISTS `stats` (
 	`id` VARCHAR(25) NOT NULL,	-- snowflake of item being recorded (user, server, channel, etc.)
