@@ -24,6 +24,7 @@ class Plugin {
 	constructor(pluginInfo) {
 		logger.debug(`Loading ${pluginInfo.name} (v${pluginInfo.version})...`);
 		this.PluginInfo = pluginInfo;
+		this.FileName = __filename;
 		logger.debug(`Loaded ${PluginInfo.name}!`);
 	}
 	
