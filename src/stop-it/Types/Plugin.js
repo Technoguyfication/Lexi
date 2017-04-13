@@ -22,17 +22,18 @@ class Plugin {
 	*/
 	///
 	constructor(pluginInfo) {
-		logger.debug(`Constructing ${pluginInfo.name} (${pluginInfo.version})...`);
+		logger.debug(`Loading ${pluginInfo.name} (v${pluginInfo.version})...`);
 		this.PluginInfo = pluginInfo;
+		logger.debug(`Loaded ${PluginInfo.name}!`);
 	}
 	
 	// Entry point
-	entryPoint() {
+	onEnable() {
 		return notImplementedStub;
 	}
 	
 	// Call for plugin to gracefully stop it's operations
-	stopPlugin() {
+	onDisable() {
 		return notImplementedStub;
 	}
 }
