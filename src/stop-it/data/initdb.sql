@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `moderators` (
 
 -- stats table
 CREATE TABLE IF NOT EXISTS `stats` (
-	`id` VARCHAR(25) NOT NULL,	-- snowflake of item being recorded (user, server, channel, etc.)
+	`id` VARCHAR(25) NOT NULL,	-- snowflake of item being recorded (user, server, channel, "global", etc.)
 	`messages` INT,	-- messages sent
 	`commands` INT,	-- commands run
 	`errors` INT,	-- number of exceptions generated
