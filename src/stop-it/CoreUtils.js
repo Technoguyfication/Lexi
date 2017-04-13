@@ -3,7 +3,7 @@
 global.exit = function(code = 0) {
 	console.log(`Exiting with code ${code}`);
 	process.exit(code);
-}
+};
 
 process.on('SIGTERM', Shutdown);
 process.on('SIGINT', Shutdown);
@@ -19,4 +19,4 @@ function Shutdown() {
 		logger.warn(`Error destroying client: ${err.stack}`);
 		exit(1);
 	});
-};
+}
