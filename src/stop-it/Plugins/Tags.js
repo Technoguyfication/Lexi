@@ -21,6 +21,7 @@ class Tags extends Plugin {
 		return new Promise((resolve, reject) => {
 			// perform db checks, etc. here
 			this.message('Enabled!');
+			return resolve();
 		});
 	}
 	
