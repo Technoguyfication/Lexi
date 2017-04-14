@@ -24,8 +24,7 @@ var pluginFileList = [];	// ['Plugin.js', 'Plugin2.js']
 function Start() {
 	return new Promise((resolve, reject) => {
 		logger.info(`Loading plugins..`);
-		refreshPluginFiles().then(files => {
-			pluginFileList = files;
+		refreshPluginFiles().then(() => {
 			logger.debug(`Loaded ${pluginFileList.length} plugin file entries..`);
 			return loadAllPlugins();
 		}).then(() => {
@@ -190,7 +189,8 @@ function refreshPluginFiles() {
 				break;
 			}
 		}
-		return resolve(entries);
+		pluginFileList = entries;
+		return resolve();
 	});
 }
 module.exports.refreshPluginFiles = refreshPluginFiles;
