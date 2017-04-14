@@ -2,12 +2,15 @@
 	plugin manager copyright blah blah blah
 */
 
-const pluginDir = __dirname + '/Plugins/';
+global.Plugin = require('./Types/Plugin.js');
+
+const pluginDir = './Plugins/';
+const fullPluginDir = `${__dirname}/${pluginDir}`;
 const pluginExtension = '.js';
 
 const PluginStatus = {
 	LOADED: 0,
-	ACTIVE: 1,
+	ENABLED: 1,
 	
 	STARTING: 2,
 	STOPPING: 3
@@ -20,34 +23,84 @@ var pluginFileList = [];	// ['Plugin.js', 'Plugin2.js']
 // starts loading stuff
 function Start() {
 	return new Promise((resolve, reject) => {
-		refreshPluginFiles.then(files => {
+		refreshPluginFiles().then(files => {
 			pluginFileList = files;
-		}).then();
-		// TODO: this stuff
+			logger.debug(`Loaded ${pluginFileList.length} plugin file entries..`);
+			return loadAllPlugins();
+		}).then(() => {
+			logger.info(`Loaded ${Object.entries(pluginList).length} plugins into memory`);
+			return enableAllPlugins();
+		}).then(() => {
+			logger.info(`All plugins enabled.`);
+		}).catch(er => {
+			logger.error(`Error occured loading and enabling plugins:\n${er.stack}`);
+		});
+	});
+}
+module.exports.Start = Start;
+
+function enablePlugin(plugin) {
+	return new Promise((resolve, reject) => {
+		switch (plugin.status) {
+			case PluginStatus.LOADED:	// ready to enable
+				try {
+					plugin.onEnable();
+				} catch(er) {
+					logger.error(`Uncaught exception enabling ${plugin.intName}:\n${er.stack}`);
+					logger.info(`Plugin ${plugin.intName} will be removed from plugin pool.`);
+					delete(pluginList[plugin.intName]);
+					return;
+				}
+				plugin.emit('enabled');
+				return resolve();
+			case PluginStatus.ENABLED:	// already enabled
+				throw new Error('Plugin already enabled.');
+			case PluginStatus.STARTING:	// already enabling
+				throw new Error('Plugin already being enabled.');
+			case PluginStatus.STOPPING:	// disabling, wait and then reenable it
+				plugin.once('disabled', () => {
+					enablePlugin(plugin).then(resolve);
+				});
+				break;
+		}
+	});
+}
+
+function enableAllPlugins() {
+	return new Promise((resolve, reject) => {
+		var enableQueue = [];
+		for (var plugin in pluginList) {
+			if (pluginList[plugin].status == PluginStatus.LOADED)
+				enableQueue.push(unrejectable(pluginList[plugin].onEnable()));
+		}
+		Promise.all(enableQueue).then(resolve).catch(er => {
+			logger.warn(`Failed enabling all plugins:\n${er.stack}`);
+		});
 	});
 }
 
 function loadPlugin(plugin) {
 	return new Promise((resolve, reject) => {
-		logger.debug(`Loading plugin ${plugin}..`);
-		var _p = new require(pluginDir + plugin)();	// load plugin from file
+		logger.debug(`Loading plugin file ${plugin}..`);
+		
+		var _p = new (require(pluginDir + plugin))();
 		
 		_p.intName = internalPluginName(_p);		// give plugin int name
-		logger.silly(`set name for ${plugin} to ${_p.name}`);
 		_p.status = PluginStatus.LOADED;			// set status to loaded
 		
 		if (pluginList[_p.intName])
 			throw new Error('Plugin already loaded.');
 		
 		pluginList[_p.intName] = _p;				// add to list of loaded plugins
-		logger.verbose(`Loaded ${plugin} as ${_p.intName}`);
+		logger.verbose(`Loaded plugin ${_p.intName}`);
+		return resolve();
 	});
 }
 
 function loadAllPlugins() {
 	return new Promise((resolve, reject) => {
 		var pluginLoadedList = [];
-		for (plugin in pluginList) {
+		for (var plugin in pluginList) {
 			pluginLoadedList.push(pluginList[plugin].FileName);
 		}
 		
@@ -61,30 +114,16 @@ function loadAllPlugins() {
 			loadQueue.push(unrejectable(loadPlugin(plugin)));
 		});
 		
-		Promise.all(loadQueue).then(() => {
-			logger.verbose(`All plugins loaded!`);
-			return resolve();
-		}).catch(er => {
+		Promise.all(loadQueue).then(resolve).catch(er => {
 			logger.error(`Error loading all plugins?\n${er.stack}`);
 		});
 	});
-	
-	function unrejectable(_promise) {
-		return new Promise((resolve, reject) => {
-			_promise().then(() => {
-				return resolve();
-			}).catch(() => {
-				logger.warn(`Failed to load ${plugin}\n${er.stack}`);
-				return resolve();
-			});
-		});
-	}
 }
 
 // gets list of loadable plugin files
 function refreshPluginFiles() {
 	return new Promise((resolve, reject) => {
-		var entries = fs.readdirSync(pluginDir, 'utf8');
+		var entries = fs.readdirSync(fullPluginDir, 'utf8');
 		for (var i = 0; i < entries.length; i++) {
 			logger.silly(`plugin file candidate found: ${entries[i]}`);
 			
@@ -95,7 +134,7 @@ function refreshPluginFiles() {
 			}
 			
 			// prune folders out
-			if (!fs.statSync(pluginDir + entries[i]).isFile()) {
+			if (!fs.statSync(fullPluginDir + entries[i]).isFile()) {
 				entries.splice(i, 1);
 				break;
 			}
@@ -105,12 +144,25 @@ function refreshPluginFiles() {
 }
 
 function internalPluginName(pl) {
-	if (typeof pl != Plugin)
-		logger.warn(`Plugin that does not extend Plugin!`).silly(pl);
+	if (!(pl instanceof Plugin)) {
+		logger.warn(`Plugin that does not extend Plugin!`);
+		logger.silly(pl);
+	}
 	
 	if (!(pl.PluginInfo.name && pl.PluginInfo.version))
 		throw new Error('Plugin does not contain name/version.');
 	
 	// "Plugin", "1.2.3" -> "Plugin_1-2-3"
 	return `${pl.PluginInfo.name}_${pl.PluginInfo.version.replace('.', '-')}`;
+}
+
+function unrejectable(_promise) {
+	return new Promise((resolve, reject) => {
+		_promise.then(() => {
+			return resolve();
+		}).catch(er => {
+			logger.warn(`Rejected item:\n${er.stack}`);
+			return resolve();
+		});
+	});
 }

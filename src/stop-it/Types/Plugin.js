@@ -7,7 +7,7 @@
 	       All methods must return a promise
 */
 
-class Plugin {
+class Plugin extends EventEmitter {
 	///
 	// Ctor requires an object containing plugin data.
 	//
@@ -22,25 +22,43 @@ class Plugin {
 	*/
 	///
 	constructor(pluginInfo) {
-		logger.debug(`Loading ${pluginInfo.name} (v${pluginInfo.version})...`);
+		logger.debug(`Constructing base for ${pluginInfo.name} (v${pluginInfo.version})`);
 		this.PluginInfo = pluginInfo;
 		this.FileName = __filename;
-		logger.debug(`Loaded ${PluginInfo.name}!`);
+		
+		this.intName = null;
+		
+		this.on('loaded', () => {
+			this.status = PluginManager.LOADED;
+		});
+		this.on('enabled', () => {
+			this.status = PluginManager.ENABLED;
+		});
+		this.on('starting', () => {
+			this.status = PluginManager.STARTING;
+		});
+		this.on('stopping', () => {
+			this.status = PluginManager.STOPPING;
+		});
+		
+		logger.debug(`Constructed base for ${this.PluginInfo.name}`);
 	}
 	
 	// Entry point
 	onEnable() {
-		return notImplementedStub;
+		return notImplementedStub();
 	}
 	
 	// Call for plugin to gracefully stop it's operations
 	onDisable() {
-		return notImplementedStub;
+		return notImplementedStub();
 	}
 }
+module.exports = Plugin;
 
 // stub for non-implemented item
-const notImplementedStub =
-	new Promise((resolve, reject) => {
-		throw new Error('Not implemented.');
-	});
+const notImplementedStub = () => {
+		new Promise((resolve, reject) => {
+			throw new Error('Not implemented.');
+		});
+};

@@ -13,6 +13,7 @@ try {
 	global.fs = require('fs');
 	global.util = require('util');
 	global.path = require('path');
+	global.EventEmitter = require('events');
 	
 	global.winston = require('winston');
 	global.wdrf = require('winston-daily-rotate-file');

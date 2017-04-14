@@ -13,17 +13,20 @@ const pluginInfo = {
 class Tags extends Plugin {
 	constructor() {
 		super(pluginInfo);
+		return this;
 	}
 	
 	// override
 	onEnable() {
-		message('Enabling Tags...');
-		// perform db checks, etc. here
-		message('Tags enabled!');
+		return new Promise((resolve, reject) => {
+			message('Enabled!');
+			// perform db checks, etc. here
+			message('Enabled!');
+		});
 	}
 }
 module.exports = Tags;
 
 function message(msg) {
-	logger.info(`[Tags] ${msg}`);
+	logger.info(`[${this.intName}] ${msg}`);
 }
