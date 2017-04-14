@@ -9,11 +9,11 @@ const fullPluginDir = `${__dirname}/${pluginDir}`;
 const pluginExtension = '.js';
 
 const PluginStatus = {
-	LOADED: 0,
-	ENABLED: 1,
+	LOADED: 1,
+	ENABLED: 2,
 	
-	STARTING: 2,
-	STOPPING: 3
+	STARTING: 3,
+	STOPPING: 4
 };
 module.exports.PluginStatus = PluginStatus;
 
@@ -23,6 +23,7 @@ var pluginFileList = [];	// ['Plugin.js', 'Plugin2.js']
 // starts loading stuff
 function Start() {
 	return new Promise((resolve, reject) => {
+		logger.verbose(`Starting plugin loading`);
 		refreshPluginFiles().then(files => {
 			pluginFileList = files;
 			logger.debug(`Loaded ${pluginFileList.length} plugin file entries..`);
@@ -46,24 +47,22 @@ function disablePlugin(plugin) {
 			case PluginStatus.LOADED:
 				throw new Error('Plugin already disabled/loaded.');
 			case PluginStatus.ENABLED:
-				try {
-					plugin.onDisable().then(() => {
-						plugin.emit('disabled');
-						return resolve();
-					});
-				} catch(er) {
-					logger.error(`Error disabling ${plugin.intName}:\n${er.stack}`);
-					unloadPlugin(plugin);
+				plugin.onDisable().then(() => {
+					plugin.emit('disabled');
 					return resolve();
-				}
+				}).catch(er => {
+					unloadPlugin(plugin);
+					return reject(`Error disabling ${plugin.intName}:\n${er.stack}`);
+				});
+				break;
 			case PluginStatus.STARTING:
 				plugin.once('enabled', () => {
 					disablePlugin(plugin).then(resolve);
 				});
+				break;
 			case PluginStatus.STOPPING:
 				throw new Error('Plugin already being disabled.');
 		}
-		return reject();
 	});
 }
 
@@ -72,16 +71,14 @@ function enablePlugin(plugin) {
 		logger.debug(`Enabling ${plugin.intName}`);
 		switch (plugin.status) {
 			case PluginStatus.LOADED:	// ready to enable
-				try {
-					plugin.onEnable().then(() => {
-						plugin.emit('enabled');
-						return resolve();
-					});
-				} catch(er) {
-					logger.error(`Uncaught exception enabling ${plugin.intName}:\n${er.stack}`);
-					unloadPlugin(plugin);
+				plugin.onEnable().then(() => {
+					plugin.emit('enabled');
 					return resolve();
-				}
+				}).catch(er => {
+					unloadPlugin(plugin);
+					return reject(`Uncaught exception enabling ${plugin.intName}:\n${er.stack}`);
+				});
+				break;
 			case PluginStatus.ENABLED:	// already enabled
 				throw new Error('Plugin already enabled.');
 			case PluginStatus.STARTING:	// already enabling
@@ -92,7 +89,6 @@ function enablePlugin(plugin) {
 				});
 				break;
 		}
-		return reject();
 	});
 }
 
@@ -197,7 +193,7 @@ function unrejectable(_promise) {
 		_promise.then(() => {
 			return resolve();
 		}).catch(er => {
-			logger.warn(`Rejected item:\n${er.stack}`);
+			logger.warn(`Rejected item:\n${er?er.stack:'--Stacktrace Unavailable--\n'+er}`);
 			return resolve();
 		});
 	});
