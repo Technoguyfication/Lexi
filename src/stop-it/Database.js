@@ -33,6 +33,7 @@ function Query(sql, values) {
 			if (err)
 				return reject(err);
 
+			logger.silly(`Results from query: ${JSON.stringify(results)}`);
 			return resolve(results, fields);
 		}
 	});

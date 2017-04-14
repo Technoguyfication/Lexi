@@ -2,5 +2,7 @@
 
 // on message received
 BotClient.on('message', msg => {
-	logger.info(`msg: ${msg}`);
+	Commands.isValidCommand(msg).catch(er => {
+		console.log(er.stack);
+	});
 });

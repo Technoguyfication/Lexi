@@ -9,7 +9,7 @@
 SET sql_notes = 0;	-- disable table already exists warnings
 
 -- serverdata table
-CREATE TABLE IF NOT EXISTS `servers` (
+CREATE TABLE IF NOT EXISTS `guilds` (
 	`id` VARCHAR(25) NOT NULL,
 	`chatprefixes` TEXT,	-- serialized JSON
 	`disabled` TINYINT DEFAULT '0',	-- bool; server disallowed from using bot

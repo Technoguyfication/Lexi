@@ -19,6 +19,12 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
+    <Compile Include="stop-it\Cache.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="stop-it\Utility.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Content Include="package.json" />
     <Compile Include="index.js" />
     <Content Include="cfg\config.default.json" />

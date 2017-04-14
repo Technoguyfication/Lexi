@@ -8,4 +8,11 @@ const builtinCommands = [
 	'eval', 'exec', 'update'
 ];
 
-
+function isValidCommand(msg) {
+	return new Promise((resolve, reject) => {
+		Utility.getCommandPrefixes(msg).then(prefixes => {
+			console.log(prefixes);
+		}, reject);
+	});
+}
+module.exports.isValidCommand = isValidCommand;

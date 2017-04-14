@@ -1,6 +1,8 @@
 // main module for bot-related activities.
 
 global.BotClient = new Discord.Client(Config.Discord.ClientOptions);
+global.Utility = require('./Utility.js');
+global.Commands = require('./Commands.js');
 
 require('./Events.js');	// bot events established before client login
 global.PluginManager = require('./PluginManager.js');
@@ -12,7 +14,7 @@ function botStart() {
 			logger.info('Client login complete.');
 			logger.debug(`Token: ${token}`);
 			PluginManager.Start().then(() => {
-				// plugin manager done
+				
 			});
 		}).catch(err => {
 			logger.error(`Failed to login to Discord: ${err.stack}`);
