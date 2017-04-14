@@ -28,18 +28,19 @@ class Plugin extends EventEmitter {
 		this.FileName = __filename;
 		
 		this.intName = null;
+		this.status = null;
 		
-		this.on('loaded', () => {
-			this.status = PluginManager.LOADED;
+		this.on('disabled', () => {
+			this.status = PluginManager.PluginStatus.LOADED;
 		});
 		this.on('enabled', () => {
-			this.status = PluginManager.ENABLED;
+			this.status = PluginManager.PluginStatus.ENABLED;
 		});
 		this.on('starting', () => {
-			this.status = PluginManager.STARTING;
+			this.status = PluginManager.PluginStatus.STARTING;
 		});
 		this.on('stopping', () => {
-			this.status = PluginManager.STOPPING;
+			this.status = PluginManager.PluginStatus.STOPPING;
 		});
 		
 		logger.debug(`Constructed base for ${this.PluginInfo.name}`);
@@ -47,19 +48,18 @@ class Plugin extends EventEmitter {
 	
 	// Entry point
 	onEnable() {
-		return notImplementedStub();
+		return new Promise((resolve, reject) => {
+			logger.warn(`onEnable not implemented for ${this.intName}`);
+			return resolve();
+		});
 	}
 	
 	// Call for plugin to gracefully stop it's operations
 	onDisable() {
-		return notImplementedStub();
+		return new Promise((resolve, reject) => {
+			logger.warn(`onDisable not implemented for ${this.intName}`);
+			return resolve();
+		});
 	}
 }
 module.exports = Plugin;
-
-// stub for non-implemented item
-const notImplementedStub = () => {
-		new Promise((resolve, reject) => {
-			throw new Error('Not implemented.');
-		});
-};

@@ -17,13 +17,13 @@ class Tags extends Plugin {
 	}
 	
 	// override
-	onEnable() {
+	/*onEnable() {
 		return new Promise((resolve, reject) => {
 			// perform db checks, etc. here
 			this.message('Enabled!');
 			return resolve();
 		});
-	}
+	}*/
 	
 	message(msg) {
 		logger.info(`[${this.intName}] ${msg}`);

@@ -9,7 +9,7 @@ const fullPluginDir = `${__dirname}/${pluginDir}`;
 const pluginExtension = '.js';
 
 const PluginStatus = {
-	LOADED: 1,
+	DISABLED: 1,
 	ENABLED: 2,
 	
 	STARTING: 3,
@@ -41,26 +41,34 @@ module.exports.Start = Start;
 
 function disablePlugin(plugin) {
 	return new Promise((resolve, reject) => {
-		logger.debug(`Disabling ${plugin.intName}`);
+		logger.info(`Disabling ${plugin.intName}`);
 		switch (plugin.status) {
-			case PluginStatus.LOADED:
+			case PluginStatus.DISABLED:
 				throw new Error('Plugin already disabled/loaded.');
 			case PluginStatus.ENABLED:
+				plugin.emit('stopping');
 				plugin.onDisable().then(() => {
 					plugin.emit('disabled');
+					logger.info(`${plugin.intName} disabled.`);
 					return resolve();
 				}).catch(er => {
+					let pName = plugin.intName;
 					unloadPlugin(plugin);
-					return reject(`Error disabling ${plugin.intName}:\n${er.stack}`);
+					return reject(`Error disabling ${pName}:\n${er.stack}`);
 				});
 				break;
 			case PluginStatus.STARTING:
 				plugin.once('enabled', () => {
-					disablePlugin(plugin).then(resolve);
+					disablePlugin(plugin).then(resolve).catch(er => {
+						logger.warn(`Failed to disable previous starting plugin`);
+						return;
+					});
 				});
 				break;
 			case PluginStatus.STOPPING:
 				throw new Error('Plugin already being disabled.');
+			default:
+				throw new Error(`Unaccounted for value: ${plugin.status}`);
 		}
 	});
 }
@@ -68,15 +76,17 @@ module.exports.disablePlugin = disablePlugin;
 
 function enablePlugin(plugin) {
 	return new Promise((resolve, reject) => {
-		logger.debug(`Enabling ${plugin.intName}`);
+		logger.info(`Enabling ${plugin.intName}`);
 		switch (plugin.status) {
-			case PluginStatus.LOADED:	// ready to enable
+			case PluginStatus.DISABLED:	// ready to enable
+				plugin.emit('starting');
 				plugin.onEnable().then(() => {
 					plugin.emit('enabled');
 					return resolve();
 				}).catch(er => {
+					let pName = plugin.intName;
 					unloadPlugin(plugin);
-					return reject(`Uncaught exception enabling ${plugin.intName}:\n${er.stack}`);
+					return reject(`Uncaught exception enabling ${pName}:\n${er.stack}`);
 				});
 				break;
 			case PluginStatus.ENABLED:	// already enabled
@@ -85,9 +95,14 @@ function enablePlugin(plugin) {
 				throw new Error('Plugin already being enabled.');
 			case PluginStatus.STOPPING:	// disabling, wait and then reenable it
 				plugin.once('disabled', () => {
-					enablePlugin(plugin).then(resolve);
+					enablePlugin(plugin).then(resolve).catch(er => {
+						logger.warn('Failed to enable previous stopping plugin.');
+						return;
+					});
 				});
 				break;
+			default:
+				throw new Error(`Unaccounted for value: ${plugin.status}`);
 		}
 	});
 }
@@ -100,7 +115,7 @@ function loadPlugin(plugin) {
 		var _p = new (require(pluginDir + plugin))();
 		
 		_p.intName = internalPluginName(_p);		// give plugin int name
-		_p.status = PluginStatus.LOADED;			// set status to loaded
+		_p.status = PluginStatus.DISABLED;			// set status to loaded
 		
 		if (pluginList[_p.intName])
 			throw new Error('Plugin already loaded.');
@@ -117,7 +132,7 @@ function disableAllPlugins() {
 		logger.info('Disabling all plugins...');
 		var disableQueue = [];
 		for (var plugin in pluginList) {
-			if (pluginList[plugin].status != PluginStatus.LOADED)
+			if (pluginList[plugin].status != PluginStatus.DISABLED)
 				disableQueue.push(unrejectable(disablePlugin(pluginList[plugin])));
 		}
 		Promise.all(disableQueue).then(resolve).catch(er => {
