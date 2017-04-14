@@ -18,8 +18,11 @@ function Shutdown() {
 		shutdownStart++;
 
 	logger.info('SIGTERM detected, gracefully stopping..');
-	PluginManager.disableAllPlugins().then(() => {
-		// make a new promise to wrap the if in
+	new Promise((resolve, reject) => {
+		if (PluginManager)
+			return PluginManager.disableAllPlugins().then(resolve);
+		else return resolve();
+	}).then(() => {
 		return new Promise((resolve, reject) => {
 			if (BotClient)
 				BotClient.destroy().then(resolve);
