@@ -23,13 +23,13 @@ var pluginFileList = [];	// ['Plugin.js', 'Plugin2.js']
 // starts loading stuff
 function Start() {
 	return new Promise((resolve, reject) => {
-		logger.verbose(`Starting plugin loading`);
+		logger.info(`Loading plugins..`);
 		refreshPluginFiles().then(files => {
 			pluginFileList = files;
 			logger.debug(`Loaded ${pluginFileList.length} plugin file entries..`);
 			return loadAllPlugins();
 		}).then(() => {
-			logger.info(`Loaded ${Object.entries(pluginList).length} plugins into memory`);
+			logger.info(`Loaded ${Object.entries(pluginList).length} plugins into memory.`);
 			return enableAllPlugins();
 		}).then(() => {
 			logger.info(`All plugins enabled.`);

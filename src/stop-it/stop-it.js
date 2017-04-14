@@ -9,7 +9,7 @@ global.PluginManager = require('./PluginManager.js');
 function botStart() {
 	return new Promise((resolve, reject) => {
 		BotClient.login(Config.Discord.Token).then(token => {
-			logger.verbose('Client login complete');
+			logger.info('Client login complete.');
 			logger.debug(`Token: ${token}`);
 			PluginManager.Start().then(() => {
 				// plugin manager done
