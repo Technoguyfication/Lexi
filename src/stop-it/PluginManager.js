@@ -115,21 +115,31 @@ module.exports.loadPlugin = loadPlugin;
 
 function disableAllPlugins() {
 	return new Promise((resolve, reject) => {
-
+		logger.info('Disabling all plugins...');
+		var disableQueue = [];
+		for (var plugin in pluginList) {
+			if (pluginList[plugin].status != PluginStatus.LOADED)
+				disableQueue.push(unrejectable(disablePlugin(pluginList[plugin])));
+		}
+		Promise.all(disableQueue).then(resolve).catch(er => {
+			logger.warn(`Failed disabling all plugins:\n${er.stack}`);
+			return resolve();
+		});
 	});
 }
 module.exports.disableAllPlugins = disableAllPlugins;
 
 function enableAllPlugins() {
 	return new Promise((resolve, reject) => {
-		logger.verbose('Enabling all plugins..');
+		logger.info('Enabling all plugins..');
 		var enableQueue = [];
 		for (var plugin in pluginList) {
-			if (pluginList[plugin].status == PluginStatus.LOADED)
+			if (pluginList[plugin].status != PluginStatus.ENABLED)
 				enableQueue.push(unrejectable(enablePlugin(pluginList[plugin])));
 		}
 		Promise.all(enableQueue).then(resolve).catch(er => {
 			logger.warn(`Failed enabling all plugins:\n${er.stack}`);
+			return resolve();
 		});
 	});
 }
@@ -137,6 +147,7 @@ module.exports.enableAllPlugins = enableAllPlugins;
 
 function loadAllPlugins() {
 	return new Promise((resolve, reject) => {
+		logger.verbose('Loading all plugins...');
 		var pluginLoadedList = [];
 		for (var plugin in pluginList) {
 			pluginLoadedList.push(pluginList[plugin].FileName);
@@ -153,7 +164,8 @@ function loadAllPlugins() {
 		});
 		
 		Promise.all(loadQueue).then(resolve).catch(er => {
-			logger.error(`Error loading all plugins?\n${er.stack}`);
+			logger.warn(`Error loading all plugins?\n${er.stack}`);
+			return resolve();
 		});
 	});
 }
