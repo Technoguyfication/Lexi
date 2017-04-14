@@ -39,21 +39,49 @@ function Start() {
 }
 module.exports.Start = Start;
 
+function disablePlugin(plugin) {
+	return new Promise((resolve, reject) => {
+		logger.debug(`Disabling ${plugin.intName}`);
+		switch (plugin.status) {
+			case PluginStatus.LOADED:
+				throw new Error('Plugin already disabled/loaded.');
+			case PluginStatus.ENABLED:
+				try {
+					plugin.onDisable().then(() => {
+						plugin.emit('disabled');
+						return resolve();
+					});
+				} catch(er) {
+					logger.error(`Error disabling ${plugin.intName}:\n${er.stack}`);
+					unloadPlugin(plugin);
+					return resolve();
+				}
+			case PluginStatus.STARTING:
+				plugin.once('enabled', () => {
+					disablePlugin(plugin).then(resolve);
+				});
+			case PluginStatus.STOPPING:
+				throw new Error('Plugin already being disabled.');
+		}
+		return reject();
+	});
+}
+
 function enablePlugin(plugin) {
 	return new Promise((resolve, reject) => {
 		logger.debug(`Enabling ${plugin.intName}`);
 		switch (plugin.status) {
 			case PluginStatus.LOADED:	// ready to enable
 				try {
-					plugin.onEnable();
+					plugin.onEnable().then(() => {
+						plugin.emit('enabled');
+						return resolve();
+					});
 				} catch(er) {
 					logger.error(`Uncaught exception enabling ${plugin.intName}:\n${er.stack}`);
-					logger.info(`Plugin ${plugin.intName} will be removed from plugin pool.`);
-					delete(pluginList[plugin.intName]);
-					return;
+					unloadPlugin(plugin);
+					return resolve();
 				}
-				plugin.emit('enabled');
-				return resolve();
 			case PluginStatus.ENABLED:	// already enabled
 				throw new Error('Plugin already enabled.');
 			case PluginStatus.STARTING:	// already enabling
@@ -64,6 +92,7 @@ function enablePlugin(plugin) {
 				});
 				break;
 		}
+		return reject();
 	});
 }
 
