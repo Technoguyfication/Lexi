@@ -6,7 +6,9 @@ const Plugin = require('./Types/Plugin.js');
 module.exports.Plugin = Plugin;
 
 const pluginDir = './Plugins/';
+// this is required because fs is relative to the main module, and require() is relative to this module
 const fullPluginDir = `${__dirname}/${pluginDir}`;
+
 const pluginExtension = '.js';
 
 const PluginStatus = {
@@ -19,6 +21,8 @@ const PluginStatus = {
 module.exports.PluginStatus = PluginStatus;
 
 var pluginList = {};		// { 'Plugin_1.0.2': instanceof(Plugin) }
+module.exports.pluginList = pluginList;
+
 var pluginFileList = [];	// ['Plugin.js', 'Plugin2.js']
 
 // starts loading stuff
@@ -219,6 +223,15 @@ function refreshPluginFiles() {
 	});
 }
 module.exports.refreshPluginFiles = refreshPluginFiles;
+
+function getPlugin(name) {
+	for (var plugin in pluginList) {
+		if (pluginList[plugin].name == name)
+			return pluginList[plugin];
+	}
+	throw new Error(`Could not find plugin by name ${name}`);
+}
+module.export.getPlugin = getPlugin;
 
 function unloadPlugin(plugin) {
 	logger.info(`Unloading plugin ${plugin.intName}`);
