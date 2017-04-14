@@ -6,6 +6,8 @@
 	however, some basic statistics and information are logged by the base code
 */
 
+SET sql_notes = 0;	-- disable table already exists warnings
+
 -- serverdata table
 CREATE TABLE IF NOT EXISTS `servers` (
 	`id` VARCHAR(25) NOT NULL,
@@ -38,3 +40,5 @@ CREATE TABLE IF NOT EXISTS `stats` (
 	`errors` INT,	-- number of exceptions generated
 	PRIMARY KEY (`id`)
 );
+
+SET sql_notes = 1;
