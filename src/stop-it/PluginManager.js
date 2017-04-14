@@ -47,8 +47,16 @@ function disablePlugin(plugin) {
 			case PluginStatus.DISABLED:
 				throw new Error('Plugin already disabled/loaded.');
 			case PluginStatus.ENABLED:
+				// timeout so if something goes wrong it doesn't hang endlessly.
+				var disableTimout = setTimeout(() => {
+					let pName = plugin.intName;
+					unloadPlugin(plugin);
+					return reject(`${pName} took too long to disable, unloading.`);
+				}, 30*1000);	// 30s
+				
 				plugin.emit('stopping');
 				plugin.onDisable().then(() => {
+					clearTimeout(disableTimout);
 					plugin.emit('disabled');
 					logger.info(`${plugin.intName} disabled.`);
 					return resolve();
