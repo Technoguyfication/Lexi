@@ -145,6 +145,11 @@ function refreshPluginFiles() {
 	});
 }
 
+function unloadPlugin(plugin) {
+	logger.info(`Unloading plugin ${plugin.intName}`);
+	delete(pluginList[plugin.intName]);
+}
+
 function internalPluginName(pl) {
 	if (!(pl instanceof Plugin)) {
 		logger.warn(`Plugin that does not extend Plugin!`);
