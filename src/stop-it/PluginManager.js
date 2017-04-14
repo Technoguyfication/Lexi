@@ -65,6 +65,7 @@ function disablePlugin(plugin) {
 		}
 	});
 }
+module.exports.disablePlugin = disablePlugin;
 
 function enablePlugin(plugin) {
 	return new Promise((resolve, reject) => {
@@ -91,20 +92,7 @@ function enablePlugin(plugin) {
 		}
 	});
 }
-
-function enableAllPlugins() {
-	return new Promise((resolve, reject) => {
-		logger.verbose('Enabling all plugins..');
-		var enableQueue = [];
-		for (var plugin in pluginList) {
-			if (pluginList[plugin].status == PluginStatus.LOADED)
-				enableQueue.push(unrejectable(enablePlugin(pluginList[plugin])));
-		}
-		Promise.all(enableQueue).then(resolve).catch(er => {
-			logger.warn(`Failed enabling all plugins:\n${er.stack}`);
-		});
-	});
-}
+module.exports.enablePlugin = enablePlugin;
 
 function loadPlugin(plugin) {
 	return new Promise((resolve, reject) => {
@@ -123,6 +111,29 @@ function loadPlugin(plugin) {
 		return resolve();
 	});
 }
+module.exports.loadPlugin = loadPlugin;
+
+function disableAllPlugins() {
+	return new Promise((resolve, reject) => {
+
+	});
+}
+module.exports.disableAllPlugins = disableAllPlugins;
+
+function enableAllPlugins() {
+	return new Promise((resolve, reject) => {
+		logger.verbose('Enabling all plugins..');
+		var enableQueue = [];
+		for (var plugin in pluginList) {
+			if (pluginList[plugin].status == PluginStatus.LOADED)
+				enableQueue.push(unrejectable(enablePlugin(pluginList[plugin])));
+		}
+		Promise.all(enableQueue).then(resolve).catch(er => {
+			logger.warn(`Failed enabling all plugins:\n${er.stack}`);
+		});
+	});
+}
+module.exports.enableAllPlugins = enableAllPlugins;
 
 function loadAllPlugins() {
 	return new Promise((resolve, reject) => {
@@ -146,6 +157,7 @@ function loadAllPlugins() {
 		});
 	});
 }
+module.exports.loadPlugin = loadPlugin;
 
 // gets list of loadable plugin files
 function refreshPluginFiles() {
@@ -169,23 +181,25 @@ function refreshPluginFiles() {
 		return resolve(entries);
 	});
 }
+module.exports.refreshPluginFiles = refreshPluginFiles;
 
 function unloadPlugin(plugin) {
 	logger.info(`Unloading plugin ${plugin.intName}`);
 	delete(pluginList[plugin.intName]);
 }
+module.exports.unloadPlugin = unloadPlugin;
 
 function internalPluginName(pl) {
 	if (!(pl instanceof Plugin)) {
-		logger.warn(`Plugin that does not extend Plugin!`);
+		logger.warn(`"Plugin" that does not extend instance of Plugin!`);
 		logger.silly(pl);
 	}
 	
 	if (!(pl.PluginInfo.name && pl.PluginInfo.version))
 		throw new Error('Plugin does not contain name/version.');
 	
-	// "Plugin", "1.2.3" -> "Plugin_1-2-3"
-	return `${pl.PluginInfo.name}_${pl.PluginInfo.version.replace('.', '-')}`;
+	// "Plugin", "1.2.3" -> "Plugin_1.2.3"
+	return `${pl.PluginInfo.name}_${pl.PluginInfo.version}`;
 }
 
 function unrejectable(_promise) {
