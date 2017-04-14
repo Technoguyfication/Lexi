@@ -8,7 +8,7 @@ new Promise((resolve, reject) => {
 	try {
 		result = fs.readFileSync(__dirname + '/../cfg/config.json', 'utf8');
 	} catch(er) {
-		return reject(new Error('Failed to access config file. Please ensure config.json exists and is accessible you fucking idiot.'));
+		return reject(new Error('Failed to access config file. Please ensure config.json exists and is accessible.'));
 	}
 		
 	global.Config = JSON.parse(result);
