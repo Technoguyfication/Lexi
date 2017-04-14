@@ -4,7 +4,7 @@
 	Copyright Hayden Andreyka 2017 All rights reserved.
 	
 	Usage: Base definition for plugins
-	       All methods must return a promise
+	       All methods except ctor must return a promise
 */
 
 class Plugin extends EventEmitter {
@@ -22,7 +22,7 @@ class Plugin extends EventEmitter {
 	*/
 	///
 	constructor(pluginInfo) {
-		logger.debug(`Constructing base for ${pluginInfo.name} (v${pluginInfo.version})`);
+		logger.silly(`Constructing base for ${pluginInfo.name} (v${pluginInfo.version})`);
 		super();
 		this.PluginInfo = pluginInfo;
 		this.FileName = __filename;
@@ -43,7 +43,7 @@ class Plugin extends EventEmitter {
 			this.status = PluginManager.PluginStatus.STOPPING;
 		});
 		
-		logger.debug(`Constructed base for ${this.PluginInfo.name}`);
+		logger.silly(`Constructed base for ${this.PluginInfo.name}`);
 	}
 	
 	// Entry point

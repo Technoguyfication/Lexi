@@ -10,20 +10,20 @@ const pluginInfo = {
 };
 
 // formal entry for plugin
-class Tags extends Plugin {
+class Tags extends PluginManager.Plugin {
 	constructor() {
 		super(pluginInfo);
 		return this;
 	}
 	
 	// override
-	/*onEnable() {
+	onEnable() {
 		return new Promise((resolve, reject) => {
 			// perform db checks, etc. here
-			this.message('Enabled!');
+			this.message('Startup complete!');
 			return resolve();
 		});
-	}*/
+	}
 	
 	message(msg) {
 		logger.info(`[${this.intName}] ${msg}`);

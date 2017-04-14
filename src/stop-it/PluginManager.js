@@ -2,7 +2,8 @@
 	plugin manager copyright blah blah blah
 */
 
-global.Plugin = require('./Types/Plugin.js');
+const Plugin = require('./Types/Plugin.js');
+module.exports.Plugin = Plugin;
 
 const pluginDir = './Plugins/';
 const fullPluginDir = `${__dirname}/${pluginDir}`;
@@ -17,7 +18,7 @@ const PluginStatus = {
 };
 module.exports.PluginStatus = PluginStatus;
 
-var pluginList = {};		// { Plugin_1-0-2: typeof(Plugin) }
+var pluginList = {};		// { 'Plugin_1.0.2': instanceof(Plugin) }
 var pluginFileList = [];	// ['Plugin.js', 'Plugin2.js']
 
 // starts loading stuff
@@ -25,10 +26,10 @@ function Start() {
 	return new Promise((resolve, reject) => {
 		logger.info(`Loading plugins..`);
 		refreshPluginFiles().then(() => {
-			logger.debug(`Loaded ${pluginFileList.length} plugin file entries..`);
+			logger.debug(`Loaded ${pluginFileList.length} plugin file entries.`);
 			return loadAllPlugins();
 		}).then(() => {
-			logger.info(`Loaded ${Object.entries(pluginList).length} plugins into memory.`);
+			logger.verbose(`Loaded ${Object.entries(pluginList).length} plugins into memory.`);
 			return enableAllPlugins();
 		}).then(() => {
 			logger.info(`All plugins enabled.`);
@@ -82,6 +83,7 @@ function enablePlugin(plugin) {
 				plugin.emit('starting');
 				plugin.onEnable().then(() => {
 					plugin.emit('enabled');
+					logger.info(`${plugin.intName} enabled.`);
 					return resolve();
 				}).catch(er => {
 					let pName = plugin.intName;
@@ -145,7 +147,7 @@ module.exports.disableAllPlugins = disableAllPlugins;
 
 function enableAllPlugins() {
 	return new Promise((resolve, reject) => {
-		logger.info('Enabling all plugins..');
+		logger.verbose('Enabling all plugins..');
 		var enableQueue = [];
 		for (var plugin in pluginList) {
 			if (pluginList[plugin].status != PluginStatus.ENABLED)
