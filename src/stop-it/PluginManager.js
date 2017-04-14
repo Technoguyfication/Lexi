@@ -231,7 +231,7 @@ function getPlugin(name) {
 	}
 	throw new Error(`Could not find plugin by name ${name}`);
 }
-module.export.getPlugin = getPlugin;
+module.exports.getPlugin = getPlugin;
 
 function unloadPlugin(plugin) {
 	logger.info(`Unloading plugin ${plugin.intName}`);
