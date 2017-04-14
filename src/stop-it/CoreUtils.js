@@ -7,16 +7,28 @@ global.exit = function(code = 0) {
 
 process.on('SIGTERM', Shutdown);
 process.on('SIGINT', Shutdown);
+var shutdownStart = 0;
 function Shutdown() {
+	if (shutdownStart) {
+		console.log('--- Press Ctrl+C again to force kill program.');
+		process.once('SIGINT', exit);
+		process.once('SIGTERM', exit);
+		return;
+	} else
+		shutdownStart++;
+
 	logger.info('SIGTERM detected, gracefully stopping..');
-	new Promise((resolve, reject) => {
-		if (BotClient)
-			BotClient.destroy().then(resolve);
-		else return resolve();
+	PluginManager.disableAllPlugins().then(() => {
+		// make a new promise to wrap the if in
+		return new Promise((resolve, reject) => {
+			if (BotClient)
+				BotClient.destroy().then(resolve);
+			else return resolve();
+		});
 	}).then(() => {
 		exit();
 	}).catch(err => {
-		logger.warn(`Error destroying client: ${err.stack}`);
+		logger.warn(`Error safely shutting down: ${err.stack}`);
 		exit(1);
 	});
 }
