@@ -41,6 +41,7 @@ module.exports.Start = Start;
 
 function enablePlugin(plugin) {
 	return new Promise((resolve, reject) => {
+		logger.debug(`Enabling ${plugin.intName}`);
 		switch (plugin.status) {
 			case PluginStatus.LOADED:	// ready to enable
 				try {
@@ -68,10 +69,11 @@ function enablePlugin(plugin) {
 
 function enableAllPlugins() {
 	return new Promise((resolve, reject) => {
+		logger.verbose('Enabling all plugins..');
 		var enableQueue = [];
 		for (var plugin in pluginList) {
 			if (pluginList[plugin].status == PluginStatus.LOADED)
-				enableQueue.push(unrejectable(pluginList[plugin].onEnable()));
+				enableQueue.push(unrejectable(enablePlugin(pluginList[plugin])));
 		}
 		Promise.all(enableQueue).then(resolve).catch(er => {
 			logger.warn(`Failed enabling all plugins:\n${er.stack}`);

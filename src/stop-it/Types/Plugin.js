@@ -23,6 +23,7 @@ class Plugin extends EventEmitter {
 	///
 	constructor(pluginInfo) {
 		logger.debug(`Constructing base for ${pluginInfo.name} (v${pluginInfo.version})`);
+		super();
 		this.PluginInfo = pluginInfo;
 		this.FileName = __filename;
 		

@@ -19,14 +19,13 @@ class Tags extends Plugin {
 	// override
 	onEnable() {
 		return new Promise((resolve, reject) => {
-			message('Enabled!');
 			// perform db checks, etc. here
-			message('Enabled!');
+			this.message('Enabled!');
 		});
+	}
+	
+	message(msg) {
+		logger.info(`[${this.intName}] ${msg}`);
 	}
 }
 module.exports = Tags;
-
-function message(msg) {
-	logger.info(`[${this.intName}] ${msg}`);
-}
