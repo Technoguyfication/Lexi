@@ -25,7 +25,7 @@ module.exports.Init = Init;
 
 function Query(sql, values) {
 	return new Promise((resolve, reject) => {
-		logger.silly(`Running database query: ${sql} with values ${values}`);
+		logger.silly(`Running database query: "${sql}" with values "${values ? values.join(", ") : "--None--"}"`);
 
 		Connections.query(sql, values, processOutput);
 
