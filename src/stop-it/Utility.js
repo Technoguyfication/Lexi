@@ -2,8 +2,9 @@
 
 function getCommandPrefixes(msg) {
 	return new Promise((resolve, reject) => {
-		if (Cache[`prefixes-${msg.guild.id}`])
-			return resolve(Cache[`prefixes-${msg.guild.id}`]);
+		if (msg.guild)
+			if (Cache[`prefixes-${msg.guild.id}`])
+				return resolve(Cache[`prefixes-${msg.guild.id}`]);
 
 		var prefixes = [];
 
@@ -16,7 +17,6 @@ function getCommandPrefixes(msg) {
 
 		if (msg.guild) {
 			Database.Query('SELECT `chatprefixes` FROM `guilds` WHERE `id` = ?', msg.guild.id).then(results => {
-				console.log(results);
 				results.forEach(result => {
 					if (!result.chatprefixes) return;
 
@@ -36,7 +36,9 @@ function getCommandPrefixes(msg) {
 
 
 		function done(p) {
-			Cache.Add(`prefixes-${msg.guild.id}`, p);
+			if (msg.guild)
+				Cache.Add(`prefixes-${msg.guild.id}`, p);
+
 			return resolve(p);
 		}
 	});
