@@ -44,7 +44,7 @@ new Promise((resolve, reject) => {
 			return resolve();
 		}, reject);
 	});
-}).then(require('./stop-it.js').botStart).catch(err => {
+}).then(require('./Stop-it.js').botStart).catch(err => {
 	console.error(`Init error: ${err.stack}`);
 	exit(1);
 });
