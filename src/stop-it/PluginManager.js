@@ -257,7 +257,8 @@ function internalPluginName(pl) {
 // retreives a command executor for the command string if possible
 function getCommandExecutor(command) {
 	if (Cache.commandList)
-		return Cache.commandList;
+		if (Cache.commandList[command])
+			return Cache.commandList[command];
 
 	var commandRefs = {};
 
@@ -271,7 +272,11 @@ function getCommandExecutor(command) {
 	}
 
 	Cache.Add('commandList', commandRefs, 900 * 1000);	// 15mins timeout
-	return commandRefs;
+
+	if (commandRefs[command])
+		return commandRefs[command];
+	else
+		return null;
 
 	function addPluginExecutor(plugin) {
 		pluginList[plugin].PluginInfo.commands.forEach(cmd => {
