@@ -14,7 +14,7 @@ function botStart() {
 			logger.info('Client login complete.');
 			logger.debug(`Token: ${token}`);
 			PluginManager.Start().then(() => {
-				
+
 			});
 		}).catch(err => {
 			logger.error(`Failed to login to Discord: ${err.stack}`);

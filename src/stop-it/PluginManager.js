@@ -14,7 +14,7 @@ const pluginExtension = '.js';
 const PluginStatus = {
 	DISABLED: 1,
 	ENABLED: 2,
-	
+
 	STARTING: 3,
 	STOPPING: 4
 };
@@ -56,8 +56,8 @@ function disablePlugin(plugin) {
 					let pName = plugin.intName;
 					unloadPlugin(plugin);
 					return reject(`${pName} took too long to disable, unloading.`);
-				}, 30*1000);	// 30s
-				
+				}, 30 * 1000);	// 30s
+
 				plugin.emit('stopping');
 				plugin.onDisable().then(() => {
 					clearTimeout(disableTimout);
@@ -127,15 +127,15 @@ module.exports.enablePlugin = enablePlugin;
 function loadPlugin(plugin) {
 	return new Promise((resolve, reject) => {
 		logger.debug(`Loading plugin file ${plugin}..`);
-		
+
 		var _p = new (require(pluginDir + plugin))();
-		
+
 		_p.intName = internalPluginName(_p);		// give plugin int name
 		_p.status = PluginStatus.DISABLED;			// set status to loaded
-		
+
 		if (pluginList[_p.intName])
 			throw new Error('Plugin already loaded.');
-		
+
 		pluginList[_p.intName] = _p;				// add to list of loaded plugins
 		logger.verbose(`Loaded plugin ${_p.intName}`);
 		return resolve();
@@ -182,9 +182,9 @@ function loadAllPlugins() {
 		for (var plugin in pluginList) {
 			pluginLoadedList.push(pluginList[plugin].FileName);
 		}
-		
+
 		var loadQueue = [];
-		
+
 		pluginFileList.forEach((plugin, index, arr) => {
 			if (pluginLoadedList.includes(plugin)) {
 				logger.debug(`${plugin} already loaded when trying to load all.`);
@@ -192,7 +192,7 @@ function loadAllPlugins() {
 			}
 			loadQueue.push(unrejectable(loadPlugin(plugin)));
 		});
-		
+
 		Promise.all(loadQueue).then(resolve).catch(er => {
 			logger.warn(`Error loading all plugins?\n${er.stack}`);
 			return resolve();
@@ -207,13 +207,13 @@ function refreshPluginFiles() {
 		var entries = fs.readdirSync(fullPluginDir, 'utf8');
 		for (var i = 0; i < entries.length; i++) {
 			logger.silly(`plugin file candidate found: ${entries[i]}`);
-			
+
 			// prune anything not ending with the extension
 			if (!entries[i].endsWith(pluginExtension)) {
 				entries.splice(i, 1);
 				break;
 			}
-			
+
 			// prune folders out
 			if (!fs.statSync(fullPluginDir + entries[i]).isFile()) {
 				entries.splice(i, 1);
@@ -237,7 +237,7 @@ module.exports.getPlugin = getPlugin;
 
 function unloadPlugin(plugin) {
 	logger.info(`Unloading plugin ${plugin.intName}`);
-	delete(pluginList[plugin.intName]);
+	delete (pluginList[plugin.intName]);
 }
 module.exports.unloadPlugin = unloadPlugin;
 
@@ -246,10 +246,10 @@ function internalPluginName(pl) {
 		logger.warn(`"Plugin" that does not extend instance of Plugin!`);
 		logger.silly(pl);
 	}
-	
+
 	if (!(pl.PluginInfo.name && pl.PluginInfo.version))
 		throw new Error('Plugin does not contain name/version.');
-	
+
 	// "Plugin", "1.2.3" -> "Plugin_1.2.3"
 	return `${pl.PluginInfo.name}_${pl.PluginInfo.version}`;
 }
@@ -298,7 +298,7 @@ function unrejectable(_promise) {
 		_promise.then(() => {
 			return resolve();
 		}).catch(er => {
-			logger.warn(`Rejected item:\n${er?er.stack:'--Stacktrace Unavailable--\n'+er}`);
+			logger.warn(`Rejected item:\n${er ? er.stack : '--Stacktrace Unavailable--\n' + er}`);
 			return resolve();
 		});
 	});

@@ -15,7 +15,7 @@ class Tags extends PluginManager.Plugin {
 		super(pluginInfo);
 		return this;
 	}
-	
+
 	// override
 	onEnable() {
 		return new Promise((resolve, reject) => {
@@ -24,7 +24,7 @@ class Tags extends PluginManager.Plugin {
 			return resolve();
 		});
 	}
-	
+
 	message(msg) {
 		logger.info(`[${this.intName}] ${msg}`);
 	}

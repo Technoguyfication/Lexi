@@ -2,7 +2,7 @@
 	"Discord": {
 		"Token": "my-authentication-key-here",
 		"Prefix": {
-			"Prefixes": [">>", "!", ">", "^"],
+			"Prefixes": [ ">>", "!", ">", "^" ],
 			"Mention": true
 		},
 		"ClientOptions": {

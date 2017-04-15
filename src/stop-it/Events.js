@@ -13,16 +13,16 @@ BotClient.on('message', msg => {
 		logger.warn(`Error checking command: ${er.stack}`);
 	});
 
-	
+
 
 	function logMessage(msg) {
 		if (msg.author.equals(BotClient.user)) {
 			if (msg.guild) {
-				logger.info(`BOT: ${msg.guild.name} / ${msg.channel.name}: ${msg.content}${msg.embeds ? "[Embed]":""}`);
-				logger.silly(`BOT: ${msg.guild.id} / ${msg.guild.name} - ${msg.channel.id} / ${msg.channel.name}: ${msg.content}${msg.embeds ? "[Embed]":""}`);
+				logger.info(`BOT: ${msg.guild.name} / ${msg.channel.name}: ${msg.content}${msg.embeds ? "[Embed]" : ""}`);
+				logger.silly(`BOT: ${msg.guild.id} / ${msg.guild.name} - ${msg.channel.id} / ${msg.channel.name}: ${msg.content}${msg.embeds ? "[Embed]" : ""}`);
 			} else {
-				logger.info(`BOT: (Private) ${msg.channel.recipient.username}: ${msg.content}${msg.embeds ? "[Embed]":""}`);
-				logger.silly(`BOT: (Private) ${msg.channel.recipient.id} / ${msg.channel.recipient.username}: ${msg.content}${msg.embeds?"[Embed]":""}`);
+				logger.info(`BOT: (Private) ${msg.channel.recipient.username}: ${msg.content}${msg.embeds ? "[Embed]" : ""}`);
+				logger.silly(`BOT: (Private) ${msg.channel.recipient.id} / ${msg.channel.recipient.username}: ${msg.content}${msg.embeds ? "[Embed]" : ""}`);
 			}
 		}
 	}

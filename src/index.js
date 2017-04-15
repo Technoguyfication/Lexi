@@ -14,14 +14,14 @@ try {
 	global.util = require('util');
 	global.path = require('path');
 	global.EventEmitter = require('events');
-	
+
 	global.winston = require('winston');
 	global.wdrf = require('winston-daily-rotate-file');
 	global.mysql = require('mysql');
 	global.Discord = require('discord.js');
 
 	global.Cache = require('./stop-it/Cache.js');
-} catch(er) {
+} catch (er) {
 	console.error(`Fatal error loading dependencies:\n\n${er.stack}`);
 	process.exit(1);
 }

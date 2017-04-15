@@ -26,10 +26,10 @@ class Plugin extends EventEmitter {
 		super();
 		this.PluginInfo = pluginInfo;
 		this.FileName = __filename;
-		
+
 		this.intName = null;
 		this.status = null;
-		
+
 		this.on('disabled', () => {
 			this.status = PluginManager.PluginStatus.LOADED;
 		});
@@ -42,10 +42,10 @@ class Plugin extends EventEmitter {
 		this.on('stopping', () => {
 			this.status = PluginManager.PluginStatus.STOPPING;
 		});
-		
+
 		logger.silly(`Constructed base for ${this.PluginInfo.name}`);
 	}
-	
+
 	// Entry point
 	onEnable() {
 		return new Promise((resolve, reject) => {
@@ -53,7 +53,7 @@ class Plugin extends EventEmitter {
 			return resolve();
 		});
 	}
-	
+
 	// Call for plugin to gracefully stop it's operations
 	onDisable() {
 		return new Promise((resolve, reject) => {

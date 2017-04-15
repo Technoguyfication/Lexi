@@ -1,6 +1,6 @@
 // core utilities for "low-level" stuff
 
-global.exit = function(code = 0) {
+global.exit = function (code = 0) {
 	console.log(`Exiting with code ${code}`);
 	process.exit(code);
 };
