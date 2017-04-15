@@ -61,5 +61,13 @@ class Plugin extends EventEmitter {
 			return resolve();
 		});
 	}
+
+	// command has been ran
+	onCommand(command, [...args]) {
+		return new Promise((resolve, reject) => {
+			logger.warn(`onCommand not implemented for ${this.intName}`);
+			return resolve();
+		});
+	}
 }
 module.exports = Plugin;
