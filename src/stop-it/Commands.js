@@ -5,7 +5,8 @@ const builtinCommands = [
 	'plugins', 'plugin', 'pl',
 	'database', 'db',
 	'stats', 'stat',
-	'eval', 'exec', 'update'
+	'eval', 'exec', 'update',
+	'quit'
 ];
 module.exports.builtinCommands = builtinCommands;
 
