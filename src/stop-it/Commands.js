@@ -47,11 +47,12 @@ function internalCommandHandler(cmd, args, msg) {
 	return new Promise((resolve, reject) => {
 		switch (cmd) {
 			case 'eval':
+				var evalString = args.join(' ');
+				logger.info(`${msg.author.username} / ${msg.author.id} running EVAL: "${evalString}"`);
 				var output;
 				let startTime = Date.now();
 				try {
-					output = eval(args.join(' '));	// jshint ignore: line
-					console.log(output);
+					output = eval(evalString);	// jshint ignore: line
 				} catch (er) {
 					msg.channel.sendEmbed(new Discord.RichEmbed({
 						//color: [255, 0, 0],
