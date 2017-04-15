@@ -62,6 +62,7 @@ function disablePlugin(plugin) {
 				plugin.onDisable().then(() => {
 					clearTimeout(disableTimout);
 					plugin.emit('disabled');
+					Cache.Delete('commandList');
 					logger.info(`${plugin.intName} disabled.`);
 					return resolve();
 				}).catch(er => {
@@ -95,6 +96,7 @@ function enablePlugin(plugin) {
 				plugin.emit('starting');
 				plugin.onEnable().then(() => {
 					plugin.emit('enabled');
+					Cache.Delete('commandList');
 					logger.info(`${plugin.intName} enabled.`);
 					return resolve();
 				}).catch(er => {
@@ -251,6 +253,40 @@ function internalPluginName(pl) {
 	// "Plugin", "1.2.3" -> "Plugin_1.2.3"
 	return `${pl.PluginInfo.name}_${pl.PluginInfo.version}`;
 }
+
+// retreives a command executor for the command string if possible
+function getCommandExecutor(command) {
+	if (Cache.commandList)
+		return Cache.commandList;
+
+	var commandRefs = {};
+
+	// build internal command list first
+	Commands.builtinCommands.forEach(cmd => {
+		addExecutor(cmd, Commands.internalCommandHandler);
+	});
+
+	for (var plugin in pluginList) {
+		addPluginExecutor(plugin);
+	}
+
+	Cache.Add('commandList', commandRefs, 900 * 1000);	// 15mins timeout
+	return commandRefs;
+
+	function addPluginExecutor(plugin) {
+		pluginList[plugin].PluginInfo.commands.forEach(cmd => {
+			addExecutor(cmd, pluginList[plugin].onCommand);
+		});
+	}
+
+	function addExecutor(cmd, exec) {
+		if (commandRefs[cmd])
+			logger.warn(`Command executor for ${cmd} already exists!`);
+
+		commandRefs[cmd] = exec;
+	}
+}
+module.exports.getCommandExecutor = getCommandExecutor;
 
 function unrejectable(_promise) {
 	return new Promise((resolve, reject) => {

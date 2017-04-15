@@ -31,9 +31,9 @@
     <Content Include="cfg\config.json" />
     <Compile Include="stop-it\CoreUtils.js" />
     <Compile Include="stop-it\Events.js" />
-    <Compile Include="stop-it\init.js" />
+    <Compile Include="stop-it\Init.js" />
     <Compile Include="stop-it\PluginManager.js" />
-    <Compile Include="stop-it\stop-it.js" />
+    <Compile Include="stop-it\Stop-it.js" />
     <Compile Include="stop-it\Plugins\Tags.js" />
     <Compile Include="stop-it\Types\Plugin.js" />
   </ItemGroup>
