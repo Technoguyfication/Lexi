@@ -53,7 +53,7 @@ function parseCommand(text, prefix) {
 	let cmdStr = text.substr(prefix.length, text.length);
 	let splitCmd = cmdStr.split(" ");
 
-	let command = splitCmd[0];
+	let command = splitCmd[0].toLowerCase();
 	let args = splitCmd.splice(1);
 
 	return { cmd: command, args: args };
