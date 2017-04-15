@@ -16,7 +16,7 @@ function getCommandPrefixes(msg) {
 			prefixes.push(BotClient.user.toString() + " ");	// "<@123456789> "
 
 		if (msg.guild) {
-			Database.Query('SELECT `chatprefixes` FROM `guilds` WHERE `id` = ?', msg.guild.id).then(results => {
+			Database.Query('SELECT `chatprefixes` FROM `guilds` WHERE `id` = ?', [msg.guild.id]).then(results => {
 				results.forEach(result => {
 					if (!result.chatprefixes) return;
 
