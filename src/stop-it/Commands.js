@@ -6,7 +6,7 @@ const builtinCommands = [
 	'database', 'db',
 	'stats', 'stat',
 	'eval', 'exec', 'update',
-	'quit'
+	'stop'
 ];
 module.exports.builtinCommands = builtinCommands;
 
