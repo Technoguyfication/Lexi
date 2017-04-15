@@ -35,3 +35,4 @@ function Shutdown() {
 		exit(1);
 	});
 }
+global.Shutdown = Shutdown;
