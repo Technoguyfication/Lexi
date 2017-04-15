@@ -11,7 +11,12 @@ const builtinCommands = [
 function isValidCommand(msg) {
 	return new Promise((resolve, reject) => {
 		Utility.getCommandPrefixes(msg).then(prefixes => {
-			console.log(prefixes);
+			for (var i = 0; i < prefixes.length; i++) {
+				if (msg.content.startsWith(prefixes[i]))
+					return resolve(true);
+			}
+
+			return resolve(false);
 		}, reject);
 	});
 }

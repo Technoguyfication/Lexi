@@ -4,11 +4,11 @@ const Cache = {
 	Add: (name, data, timeout = 3000 * 1000) => {
 		Cache[name] = data;
 
-		logger.silly(`Added ${name} to cache: ${data}`);
+		logger.silly(`Added ${name} to cache: ${JSON.stringify(data)}`);
 
 		setTimeout(() => {
 			if (Cache[name])
-				delete Cache[name];
+				Cache.Delete(name);
 		}, timeout);
 	},
 	Delete: (name) => {
