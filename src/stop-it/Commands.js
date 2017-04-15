@@ -45,7 +45,30 @@ module.exports.runCommand = runCommand;
 
 function internalCommandHandler(cmd, args, msg) {
 	return new Promise((resolve, reject) => {
+		switch (cmd) {
+			case 'eval':
+				var output;
+				let startTime = Date.now();
+				try {
+					output = eval(args.join(' '));	// jshint ignore: line
+					console.log(output);
+				} catch (er) {
+					msg.channel.sendEmbed(new Discord.RichEmbed({
+						//color: [255, 0, 0],
+						title: `Unhandled Exception`,
+						description: er.stack
+					})).catch(Utility.messageCatch);
+					return resolve();
+				}
+				let elapsedTime = Date.now() - startTime;
 
+				msg.channel.sendEmbed(new Discord.RichEmbed({
+					//color: [28, 206, 108],
+					title: `Evaluation Complete | ${elapsedTime}ms`,
+					description: `${output}`
+				})).catch(Utility.messageCatch);
+				return resolve();
+		}
 	});
 }
 module.exports.internalCommandHandler = internalCommandHandler;

@@ -18,6 +18,8 @@ function getCommandPrefixes(msg) {
 			Database.Query('SELECT `chatprefixes` FROM `guilds` WHERE `id` = ?', msg.guild.id).then(results => {
 				console.log(results);
 				results.forEach(result => {
+					if (!result.chatprefixes) return;
+
 					let r = JSON.parse(result.chatprefixes);
 					r.forEach(p => {
 						prefixes.push(p);
@@ -50,3 +52,8 @@ function resolveUser(string) {
 	}
 }
 module.exports.resolveUser = resolveUser;
+
+function messageCatch(er) {
+	logger.warn(`Error sending message:\n${er}`);
+}
+module.exports.messageCatch = messageCatch;
