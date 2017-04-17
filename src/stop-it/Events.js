@@ -24,9 +24,9 @@ BotClient.on('message', msg => {
 			}
 		} else {
 			if (msg.guild) {
-				logger.verbose('test');
+				logger.verbose(`MSG: ${msg.guild.id} / ${msg.guild.name} - ${msg.channel.id} / ${msg.channel.name} (${msg.author.id} / ${msg.author.username} : ${msg.content}`);
 			} else {
-
+				logger.verbose(`MSG: (Private) ${msg.channel.recipient.id} / ${msg.channel.recipient.username}: ${msg.content}`);
 			}		
 		}
 	}
