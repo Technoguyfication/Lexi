@@ -36,7 +36,7 @@ function runCommand(msg, prefix) {
 			return resolve();
 		}).catch(er => {
 			logger.warn(`Unhandled exception running command ${command.cmd} ${command.args.join(' ')}\n${er.stack}`);
-			msg.channel.send(`Unhandled exception occured processing your command.`);
+			msg.channel.send(`Unhandled exception occured processing your command${Utility.isBotAdmin(msg.author) ? ':\n```\n' + er.stack + '```': '.'}`);	// if called by admin show stacktrace
 			return resolve();
 		});
 	});
