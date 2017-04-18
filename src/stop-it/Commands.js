@@ -1,13 +1,34 @@
 // command manager that has everything to do with commands
 
-const builtinCommands = [
-	'help',
-	'plugins', 'plugin', 'pl',
-	'database', 'db',
-	'stats', 'stat',
-	'eval', 'exec', 'update',
-	'stop'
-];
+const builtinCommands = {
+	'eval': {
+		description: 'Evaluates a JavaScript expression.',
+		usage: 'eval (expression)',
+		permissions: {
+			bot: Permissions.BotPermissions.ADMIN,
+			discord: [],
+			guild: Permissions.GuildPermissions.USER
+		}
+	},
+	'exec': {
+		description: 'Runs a command at the local command line.',
+		usage: 'exec (command)',
+		permissions: {
+			bot: Permissions.BotPermissions.ADMIN,
+			discord: [],
+			guild: Permissions.GuildPermissions.USER
+		}
+	},
+	'help': {
+		description: 'Displays a list of commands or the help topic for a specific command.',
+		usage: 'help [command]',
+		permissions: {
+			bot: Permissions.BotPermissions.USER,
+			discord: [],
+			guild: Permissions.GuildPermissions.USER
+		}
+	},
+};
 module.exports.builtinCommands = builtinCommands;
 
 function isValidCommand(msg) {
