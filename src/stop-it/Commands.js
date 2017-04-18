@@ -65,14 +65,20 @@ function runCommand(msg, prefix) {
 			return;
 		}
 
-		
+		let cmdInfo = PluginManager.getCommandInfo(command.cmd);
+
+		if (!cmdInfo) {
+			logger.warn(`${command.cmd} has no info!`);
+			msg.channel.send();
+			return;
+		}
 
 		executor(command.cmd, command.args, msg).then(() => {
 			logger.silly(`finished running command ${command.cmd}`);
 			return resolve();
 		}).catch(er => {
 			logger.warn(`Unhandled exception running command ${command.cmd} ${command.args.join(' ')}\n${er.stack}`);
-			msg.channel.send(`Unhandled exception occured processing your command${Utility.isBotAdmin(msg.author) ? ':\n```\n' + er.stack + '```': '.'}`);	// if called by admin show stacktrace
+			msg.channel.send(`Unhandled exception occured processing your command${Utility.isBotAdmin(msg.author) ? ':\n```\n' + er.stack + '```' : '.'}`);	// if called by admin show stacktrace
 			return resolve();
 		});
 	});
@@ -82,7 +88,7 @@ module.exports.runCommand = runCommand;
 function internalCommandHandler(cmd, args, msg) {
 	return new Promise((resolve, reject) => {
 		switch (cmd) {
-			case 'eval':
+			case 'eval': {
 				var evalString = args.join(' ');
 				logger.info(`${msg.author.username} / ${msg.author.id} running EVAL: "${evalString}"`);
 				var output;
@@ -90,24 +96,43 @@ function internalCommandHandler(cmd, args, msg) {
 				try {
 					output = eval(evalString);	// jshint ignore: line
 				} catch (er) {
-					msg.channel.sendEmbed(new Discord.RichEmbed({
-						//color: [255, 0, 0],
+					msg.channel.sendEmbed({
 						title: `Unhandled Exception`,
-						description: er.stack
-					})).catch(Utility.messageCatch);
+						description: `\`\`\`${er.stack}\`\`\``
+					}).catch(Utility.messageCatch);
 					return resolve();
 				}
 				let elapsedTime = Date.now() - startTime;
 
-				msg.channel.sendEmbed(new Discord.RichEmbed({
-					//color: [28, 206, 108],
-					title: `Evaluation Complete | ${elapsedTime}ms`,
-					description: `${output}`
-				})).catch(Utility.messageCatch);
+				msg.channel.sendEmbed({
+					title: `Evaluation Complete! | ${elapsedTime}ms`,
+					description: `\`\`\`${output}\`\`\``
+				}).catch(Utility.messageCatch);
 				return resolve();
-			case 'exec':
+			}
+			case 'exec': {
+				let startTime = Date.now();
+				child_process.exec(args.join(' '), processOutput);
+				let elapsed = Date.now() - startTime;
 
+				function processOutput(err, stdout, stderr) {
+					if (err)
+						return reject(err);
+
+					var returnText = "";
+
+					returnText += `STDOUT:\n\`\`\`\n${stdout}\n\`\`\``;
+
+					if (stderr)
+						returnText += `\n\nSTDERR:\n\`\`\`\n${stderr}\n\`\`\``;
+
+					msg.channel.sendEmbed({
+						title: `Execution Complete! | ${elapsed}ms`,
+						description: returnText
+					});
+				}
 				return resolve();
+			}
 
 			default:
 				return reject(new Error('Command not implemented.'));
