@@ -13,7 +13,7 @@ try {
 	global.fs = require('fs');
 	global.util = require('util');
 	global.path = require('path');
-	global.process = require('process');
+	global.child_process = require('child_process');
 	global.EventEmitter = require('events');
 
 	global.winston = require('winston');
