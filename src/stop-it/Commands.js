@@ -1,5 +1,12 @@
 // command manager that has everything to do with commands
 
+const CommandScope = {
+	ALL: 1,
+	GUILD: 2,
+	PRIVATE: 3
+};
+module.exports.CommandScope = CommandScope;
+
 const builtinCommands = {
 	'eval': {
 		description: 'Evaluates a JavaScript expression.',
@@ -8,7 +15,8 @@ const builtinCommands = {
 			bot: Permissions.BotPermissions.ADMIN,
 			discord: [],
 			guild: Permissions.GuildPermissions.USER
-		}
+		},
+		scope: CommandScope.ALL
 	},
 	'exec': {
 		description: 'Runs a command at the local command line.',
@@ -17,7 +25,8 @@ const builtinCommands = {
 			bot: Permissions.BotPermissions.ADMIN,
 			discord: [],
 			guild: Permissions.GuildPermissions.USER
-		}
+		},
+		scope: CommandScope.ALL
 	},
 	'help': {
 		description: 'Displays a list of commands or the help topic for a specific command.',
@@ -26,7 +35,8 @@ const builtinCommands = {
 			bot: Permissions.BotPermissions.USER,
 			discord: [],
 			guild: Permissions.GuildPermissions.USER
-		}
+		},
+		scope: CommandScope.ALL
 	},
 };
 module.exports.builtinCommands = builtinCommands;
@@ -54,6 +64,8 @@ function runCommand(msg, prefix) {
 			logger.debug(`Command ${command.cmd} does not exist.`);
 			return;
 		}
+
+		
 
 		executor(command.cmd, command.args, msg).then(() => {
 			logger.silly(`finished running command ${command.cmd}`);
