@@ -45,7 +45,7 @@ function getCommandPrefixes(msg) {
 }
 module.exports.getCommandPrefixes = getCommandPrefixes;
 
-function resolveUser(string) {
+function resolveUserFromMention(string) {
 	if (typeof (string) == Discord.Message)
 		string = string.msg;
 
@@ -53,9 +53,20 @@ function resolveUser(string) {
 		return string.replace(/\D/, '');
 	}
 }
-module.exports.resolveUser = resolveUser;
+module.exports.resolveUserFromMention = resolveUserFromMention;
 
 function messageCatch(er) {
 	logger.warn(`Error sending message:\n${er}`);
 }
 module.exports.messageCatch = messageCatch;
+
+function isBotAdmin(user) {
+	var userid;
+	if (user instanceof Discord.User)
+		userid = user.id;
+	else
+		userid = user;
+
+	return Config.Bot.Admins.includes(userid);
+}
+module.exports.isBotAdmin = isBotAdmin;

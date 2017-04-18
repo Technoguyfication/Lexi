@@ -1,4 +1,7 @@
 {
+	"Bot": {
+		"Admins": [ "Snowflake", "Snowflake" ]
+	},
 	"Discord": {
 		"Token": "my-authentication-key-here",
 		"Prefix": {
