@@ -17,7 +17,21 @@ class Plugin extends EventEmitter {
 			name: 'My Plugin',
 			version: '1.2.3',
 			author: 'John Doe <jdoe@example.com>',
-			commands: ['top', 'kek']
+			commands: {
+				'top': {
+					description: 'does stuff',
+					usage: 'top (kek) [lel/lol]'
+					permissions: {
+						bot: Permissions.BotPermissions.USER,
+						discord: [ 'MANAGE_MESSAGES', 'READ_MESSAGES' ],	// 'SEND_MESSAGES', and 'READ_MESSAGES' aren't really needed
+						guild: Permissions.GuildPermissions.MODERATOR
+					},
+					alias: null		// if not null this WILL alias another command no matter what
+				},
+				'kek': {
+					//...,
+					alias: 'top'	// this will always run command "top"
+				}
 		}
 	*/
 	///
