@@ -50,7 +50,10 @@ function runCommand(msg, prefix) {
 		var command = parseCommand(msg.content, prefix);
 		var executor = PluginManager.getCommandExecutor(command.cmd);
 
-		if (!executor) return;	// command does not exist
+		if (!executor) {	// command does not exist
+			logger.debug(`Command ${command.cmd} does not exist.`);
+			return;
+		}
 
 		executor(command.cmd, command.args, msg).then(() => {
 			logger.silly(`finished running command ${command.cmd}`);

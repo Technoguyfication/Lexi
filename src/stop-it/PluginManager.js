@@ -263,9 +263,9 @@ function getCommandExecutor(command) {
 	var commandRefs = {};
 
 	// build internal command list first
-	Commands.builtinCommands.forEach(cmd => {
-		addExecutor(cmd, Commands.internalCommandHandler);
-	});
+	for (var command in Commands.builtinCommands) {
+		addExecutor(command, Commands.internalCommandHandler);
+	}
 
 	for (var plugin in pluginList) {
 		addPluginExecutor(plugin);
@@ -279,14 +279,14 @@ function getCommandExecutor(command) {
 		return null;
 
 	function addPluginExecutor(plugin) {
-		pluginList[plugin].PluginInfo.commands.forEach(cmd => {
-			addExecutor(cmd, pluginList[plugin].onCommand);
-		});
+		for (var command in pluginList[plugin].PluginInfo.commands) {
+			addExecutor(command, pluginList[plugin].onCommand);
+		}
 	}
 
 	function addExecutor(cmd, exec) {
 		if (commandRefs[cmd])
-			logger.warn(`Command executor for ${cmd} already exists!`);
+			logger.warn(`Duplicate command executor for ${cmd}`);
 
 		commandRefs[cmd] = exec;
 	}

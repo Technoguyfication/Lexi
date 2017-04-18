@@ -22,6 +22,9 @@
     <Compile Include="stop-it\Cache.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="stop-it\Permissions.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="stop-it\Utility.js">
       <SubType>Code</SubType>
     </Compile>

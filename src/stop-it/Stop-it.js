@@ -1,6 +1,7 @@
 // main module for bot-related activities.
 
 global.BotClient = new Discord.Client(Config.Discord.ClientOptions);
+global.Permissions = require('./Permissions.js');
 global.Utility = require('./Utility.js');
 global.Commands = require('./Commands.js');
 
