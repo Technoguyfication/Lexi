@@ -69,6 +69,12 @@ function internalCommandHandler(cmd, args, msg) {
 					description: `${output}`
 				})).catch(Utility.messageCatch);
 				return resolve();
+			case 'exec':
+
+				return resolve();
+
+			default:
+				return reject(new Error('Command not implemented.'));
 		}
 	});
 }
