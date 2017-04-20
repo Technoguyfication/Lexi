@@ -50,7 +50,7 @@ function isValidCommand(msg) {
 			}
 
 			return resolve(false, null);
-		}, reject);
+		}).catch(reject);
 	});
 }
 module.exports.isValidCommand = isValidCommand;
@@ -62,28 +62,45 @@ function runCommand(msg, prefix) {
 
 		if (!executor) {	// command does not exist
 			logger.debug(`Command ${command.cmd} does not exist.`);
-			return;
+			return resolve();
 		}
 
 		let cmdInfo = PluginManager.getCommandInfo(command.cmd);
 
 		if (!cmdInfo) {
 			logger.warn(`${command.cmd} has no info!`);
-			msg.channel.send();
-			return;
+			commandErrorResponse(msg, 'Command info not found.');
+			return resolve();
 		}
 
+		logger.info(`${msg.author.id} / ${msg.author.name} executed command ${command.cmd} with args "${command.args.join(' ')}"`);
+
 		executor(command.cmd, command.args, msg).then(() => {
-			logger.silly(`finished running command ${command.cmd}`);
+			logger.debug(`finished running command ${command.cmd}`);
 			return resolve();
 		}).catch(er => {
-			logger.warn(`Unhandled exception running command ${command.cmd} ${command.args.join(' ')}\n${er.stack}`);
-			msg.channel.send(`Unhandled exception occured processing your command${Utility.isBotAdmin(msg.author) ? ':\n```\n' + er.stack + '```' : '.'}`);	// if called by admin show stacktrace
+			logger.warn(`(${msg.author.id}) Unhandled exception running command ${command.cmd} ${command.args.join(' ')}\n${er.stack}`);
+			commandErrorResponse(msg, 'Unhandled exception', er);
 			return resolve();
 		});
 	});
 }
 module.exports.runCommand = runCommand;
+
+function commandErrorResponse(msg, response, er) {
+	return new Promise((resolve, reject) => {
+		var extratext = "";
+		if (response)
+			extratext += response;
+
+		if (er && Utility.isBotAdmin(msg.author)) {
+			extratext += `\n\nError Details:\n\`${(er.message || er)}\``;
+			if (er.stack)
+				extratext += `\n\nStacktrace:\n\`\`\`\n${er.stack}\n\`\`\``;
+		}
+		msg.channel.send(`An error occured processing your command${(extratext||'.')}`).then(resolve, reject);
+	});
+}
 
 function internalCommandHandler(cmd, args, msg) {
 	return new Promise((resolve, reject) => {
