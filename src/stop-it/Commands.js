@@ -67,6 +67,34 @@ function runCommand(msg, prefix) {
 
 		let cmdInfo = PluginManager.getCommandInfo(command.cmd);
 
+		switch (cmdInfo.scope) {
+			case CommandScope.ALL:
+				break;
+			case CommandScope.GUILD:
+				if (msg.guild)
+					break;
+				else {
+					commandErrorResponse(msg, 'You can only run this command on a server.');
+					return resolve();
+				}
+			case CommandScope.PRIVATE:
+				if (msg.guild) {
+					commandErrorResponse(msg, 'This command must be run in a direct message.');
+					return resolve();
+				} else
+					break;
+			default:
+				commandError(msg, null);
+				return resolve();
+		}
+
+		let commandDeny = Permissions.commandDenied(msg, cmdInfo);
+
+		if (commandDeny) {
+			commandErrorResponse(msg, `Permission error(s) running command \`${command.cmd}}\`: ${commandDeny}`);
+			return resolve();
+		}
+
 		if (!cmdInfo) {
 			logger.warn(`${command.cmd} has no info!`);
 			commandErrorResponse(msg, 'Command info not found.');
@@ -80,14 +108,14 @@ function runCommand(msg, prefix) {
 			return resolve();
 		}).catch(er => {
 			logger.warn(`(${msg.author.id}) Unhandled exception running command ${command.cmd} ${command.args.join(' ')}\n${er.stack}`);
-			commandErrorResponse(msg, 'Unhandled exception', er);
+			commandErrorResponse(msg, null, er);
 			return resolve();
 		});
 	});
 }
 module.exports.runCommand = runCommand;
 
-function commandErrorResponse(msg, response, er) {
+function commandErrorResponse(msg, message = 'An error occured processing your command.', er = null) {
 	return new Promise((resolve, reject) => {
 		var extratext = "";
 		if (response)
@@ -98,7 +126,7 @@ function commandErrorResponse(msg, response, er) {
 			if (er.stack)
 				extratext += `\n\nStacktrace:\n\`\`\`\n${er.stack}\n\`\`\``;
 		}
-		msg.channel.send(`An error occured processing your command${(extratext||'.')}`).then(resolve, reject);
+		msg.channel.send(message + (extratext || '')).then(resolve).catch(Utility.messageCatch);
 	});
 }
 

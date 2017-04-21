@@ -8,11 +8,11 @@
 
 SET sql_notes = 0;	-- disable table already exists warnings
 
--- serverdata table
+-- guilddata table
 CREATE TABLE IF NOT EXISTS `guilds` (
 	`id` VARCHAR(25) NOT NULL,
 	`chatprefixes` TEXT,	-- serialized JSON
-	`disabled` TINYINT DEFAULT '0',	-- bool; server disallowed from using bot
+	`disabled` TINYINT DEFAULT '0',	-- bool; guild disallowed from using bot
 	PRIMARY KEY (`id`)
 );
 
@@ -27,14 +27,14 @@ CREATE TABLE IF NOT EXISTS `users` (
 
 -- moderators table
 CREATE TABLE IF NOT EXISTS `moderators` (
-	`serverid` VARCHAR(25) NOT NULL,
+	`guildid` VARCHAR(25) NOT NULL,
 	`userid` VARCHAR(25) NOT NULL,
-	PRIMARY KEY (`serverid`)
+	PRIMARY KEY (`guildid`)
 );
 
 -- stats table
 CREATE TABLE IF NOT EXISTS `stats` (
-	`id` VARCHAR(25) NOT NULL,	-- snowflake of item being recorded (user, server, channel, "global", etc.)
+	`id` VARCHAR(25) NOT NULL,	-- snowflake of item being recorded (user, guild, channel, "global", etc.)
 	`messages` INT,	-- messages sent
 	`commands` INT,	-- commands run
 	`errors` INT,	-- number of exceptions generated
