@@ -263,26 +263,23 @@ function getCommandExecutor(command) {
 	var commandRefs = {};
 
 	// build internal command list first
-	for (var command in Commands.builtinCommands) {
-		addExecutor(command, Commands.internalCommandHandler);
+	for (let cmd in Commands.builtinCommands) {
+		addExecutor(cmd, Commands.internalCommandHandler);
 	}
 
-	for (var plugin in pluginList) {
-		addPluginExecutor(plugin);
+	// now add command from every plugin
+	for (let plugin in pluginList) {
+		for (let cmd in pluginList[plugin].PluginInfo.commands) {
+			addExecutor(cmd, pluginList[plugin].onCommand);
+		}
 	}
 
-	Cache.Add('commandList', commandRefs, 900 * 1000);	// 15mins timeout
+	Cache.Add('commandList', commandRefs, 9e5);	// 15mins timeout
 
 	if (commandRefs[command])
 		return commandRefs[command];
 	else
 		return null;
-
-	function addPluginExecutor(plugin) {
-		for (var command in pluginList[plugin].PluginInfo.commands) {
-			addExecutor(command, pluginList[plugin].onCommand);
-		}
-	}
 
 	function addExecutor(cmd, exec) {
 		if (commandRefs[cmd])
@@ -292,6 +289,63 @@ function getCommandExecutor(command) {
 	}
 }
 module.exports.getCommandExecutor = getCommandExecutor;
+
+function getCommandInfo(command) {
+	if (Cache.commandInfo)
+		if (Cache.commandInfo[command])
+			return Cache.commandInfo[command];
+
+	var commandInfo = {};
+	var commandAliases = {};
+
+	// populate list with builtin commands
+	for (let cmd in Commands.builtinCommands) {
+		addInfo(cmd, Commands.builtinCommands[cmd]);
+	}
+
+	// now add every command from every plugin
+	for (let plugin in pluginList) {
+		for (let cmd in pluginList[plugin].PluginInfo.commands) {
+			addInfo(cmd, pluginList[plugin].PluginInfo.commands[cmd]);
+		}
+	}
+
+	// now add all the aliases last
+	for (let cmd in commandAliases) {
+		if (!commandInfo[cmd]) {
+			logger.warn(`Alias target ${cmd} nonexistent.`);
+			return;
+		}
+
+		for (let alias in commandAliases[cmd]) {
+			addInfo(commandAliases[cmd][alias], commandInfo[cmd]);
+		}
+	}
+
+	Cache.Add('commandInfo', commandInfo, 9e5);	// 15 minutes
+
+	if (commandInfo[command])
+		return commandInfo[command];
+	else
+		return null;
+
+	function addInfo(cmd, info) {
+		if (info.alias) {
+			if (commandAliases[info.alias]) {
+				commandAliases[info.alias].push(cmd);
+			} else {
+				commandAliases[info.alias] = [cmd];
+			}
+			return;
+		}
+
+		if (commandInfo[cmd])
+			logger.warn(`Duplicate command info for ${cmd}`);
+
+		commandInfo[cmd] = info;
+	}
+}
+module.exports.getCommandInfo = getCommandInfo;
 
 function unrejectable(_promise) {
 	return new Promise((resolve, reject) => {

@@ -1,5 +1,12 @@
 // command manager that has everything to do with commands
 
+const CommandScope = {
+	ALL: 1,
+	GUILD: 2,
+	PRIVATE: 3
+};
+module.exports.CommandScope = CommandScope;
+
 const builtinCommands = {
 	'eval': {
 		description: 'Evaluates a JavaScript expression.',
@@ -8,7 +15,8 @@ const builtinCommands = {
 			bot: Permissions.BotPermissions.ADMIN,
 			discord: [],
 			guild: Permissions.GuildPermissions.USER
-		}
+		},
+		scope: CommandScope.ALL
 	},
 	'exec': {
 		description: 'Runs a command at the local command line.',
@@ -17,7 +25,8 @@ const builtinCommands = {
 			bot: Permissions.BotPermissions.ADMIN,
 			discord: [],
 			guild: Permissions.GuildPermissions.USER
-		}
+		},
+		scope: CommandScope.ALL
 	},
 	'help': {
 		description: 'Displays a list of commands or the help topic for a specific command.',
@@ -26,7 +35,8 @@ const builtinCommands = {
 			bot: Permissions.BotPermissions.USER,
 			discord: [],
 			guild: Permissions.GuildPermissions.USER
-		}
+		},
+		scope: CommandScope.ALL
 	},
 };
 module.exports.builtinCommands = builtinCommands;
@@ -40,7 +50,7 @@ function isValidCommand(msg) {
 			}
 
 			return resolve(false, null);
-		}, reject);
+		}).catch(reject);
 	});
 }
 module.exports.isValidCommand = isValidCommand;
@@ -52,25 +62,78 @@ function runCommand(msg, prefix) {
 
 		if (!executor) {	// command does not exist
 			logger.debug(`Command ${command.cmd} does not exist.`);
-			return;
+			return resolve();
 		}
 
+		let cmdInfo = PluginManager.getCommandInfo(command.cmd);
+
+		switch (cmdInfo.scope) {
+			case CommandScope.ALL:
+				break;
+			case CommandScope.GUILD:
+				if (msg.guild)
+					break;
+				else {
+					commandErrorResponse(msg, 'You can only run this command on a server.');
+					return resolve();
+				}
+			case CommandScope.PRIVATE:
+				if (msg.guild) {
+					commandErrorResponse(msg, 'This command must be run in a direct message.');
+					return resolve();
+				} else
+					break;
+			default:
+				commandError(msg, null);
+				return resolve();
+		}
+
+		let commandDeny = Permissions.commandDenied(msg, cmdInfo);
+
+		if (commandDeny) {
+			commandErrorResponse(msg, `Permission error(s) running command \`${command.cmd}}\`: ${commandDeny}`);
+			return resolve();
+		}
+
+		if (!cmdInfo) {
+			logger.warn(`${command.cmd} has no info!`);
+			commandErrorResponse(msg, 'Command info not found.');
+			return resolve();
+		}
+
+		logger.info(`${msg.author.id} / ${msg.author.name} executed command ${command.cmd} with args "${command.args.join(' ')}"`);
+
 		executor(command.cmd, command.args, msg).then(() => {
-			logger.silly(`finished running command ${command.cmd}`);
+			logger.debug(`finished running command ${command.cmd}`);
 			return resolve();
 		}).catch(er => {
-			logger.warn(`Unhandled exception running command ${command.cmd} ${command.args.join(' ')}\n${er.stack}`);
-			msg.channel.send(`Unhandled exception occured processing your command${Utility.isBotAdmin(msg.author) ? ':\n```\n' + er.stack + '```': '.'}`);	// if called by admin show stacktrace
+			logger.warn(`(${msg.author.id}) Unhandled exception running command ${command.cmd} ${command.args.join(' ')}\n${er.stack}`);
+			commandErrorResponse(msg, null, er);
 			return resolve();
 		});
 	});
 }
 module.exports.runCommand = runCommand;
 
+function commandErrorResponse(msg, message = 'An error occured processing your command.', er = null) {
+	return new Promise((resolve, reject) => {
+		var extratext = "";
+		if (response)
+			extratext += response;
+
+		if (er && Utility.isBotAdmin(msg.author)) {
+			extratext += `\n\nError Details:\n\`${(er.message || er)}\``;
+			if (er.stack)
+				extratext += `\n\nStacktrace:\n\`\`\`\n${er.stack}\n\`\`\``;
+		}
+		msg.channel.send(message + (extratext || '')).then(resolve).catch(Utility.messageCatch);
+	});
+}
+
 function internalCommandHandler(cmd, args, msg) {
 	return new Promise((resolve, reject) => {
 		switch (cmd) {
-			case 'eval':
+			case 'eval': {
 				var evalString = args.join(' ');
 				logger.info(`${msg.author.username} / ${msg.author.id} running EVAL: "${evalString}"`);
 				var output;
@@ -78,24 +141,43 @@ function internalCommandHandler(cmd, args, msg) {
 				try {
 					output = eval(evalString);	// jshint ignore: line
 				} catch (er) {
-					msg.channel.sendEmbed(new Discord.RichEmbed({
-						//color: [255, 0, 0],
+					msg.channel.sendEmbed({
 						title: `Unhandled Exception`,
-						description: er.stack
-					})).catch(Utility.messageCatch);
+						description: `\`\`\`${er.stack}\`\`\``
+					}).catch(Utility.messageCatch);
 					return resolve();
 				}
 				let elapsedTime = Date.now() - startTime;
 
-				msg.channel.sendEmbed(new Discord.RichEmbed({
-					//color: [28, 206, 108],
-					title: `Evaluation Complete | ${elapsedTime}ms`,
-					description: `${output}`
-				})).catch(Utility.messageCatch);
+				msg.channel.sendEmbed({
+					title: `Evaluation Complete! | ${elapsedTime}ms`,
+					description: `\`\`\`${output}\`\`\``
+				}).catch(Utility.messageCatch);
 				return resolve();
-			case 'exec':
+			}
+			case 'exec': {
+				let startTime = Date.now();
+				child_process.exec(args.join(' '), processOutput);
+				let elapsed = Date.now() - startTime;
 
+				function processOutput(err, stdout, stderr) {
+					if (err)
+						return reject(err);
+
+					var returnText = "";
+
+					returnText += `STDOUT:\n\`\`\`\n${stdout}\n\`\`\``;
+
+					if (stderr)
+						returnText += `\n\nSTDERR:\n\`\`\`\n${stderr}\n\`\`\``;
+
+					msg.channel.sendEmbed({
+						title: `Execution Complete! | ${elapsed}ms`,
+						description: returnText
+					});
+				}
 				return resolve();
+			}
 
 			default:
 				return reject(new Error('Command not implemented.'));

@@ -46,7 +46,7 @@ function getCommandPrefixes(msg) {
 module.exports.getCommandPrefixes = getCommandPrefixes;
 
 function resolveUserFromMention(string) {
-	if (typeof (string) == Discord.Message)
+	if (string instanceof Discord.Message)
 		string = string.msg;
 
 	if (string.match(Discord.MessageMentions.USERS_PATTERN)) {

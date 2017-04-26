@@ -26,6 +26,7 @@ class Plugin extends EventEmitter {
 						discord: [ 'MANAGE_MESSAGES', 'READ_MESSAGES' ],	// 'SEND_MESSAGES', and 'READ_MESSAGES' aren't really needed
 						guild: Permissions.GuildPermissions.MODERATOR
 					},
+					scope: Commands.CommandScope.ALL,
 					alias: null		// if not null this WILL alias another command no matter what
 				},
 				'kek': {
