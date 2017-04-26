@@ -19,35 +19,35 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
-    <Compile Include="stop-it\Cache.js">
+    <Compile Include="Lexi\Cache.js">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="stop-it\Permissions.js">
+    <Compile Include="Lexi\Permissions.js">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="stop-it\Utility.js">
+    <Compile Include="Lexi\Utility.js">
       <SubType>Code</SubType>
     </Compile>
     <Content Include="package.json" />
     <Compile Include="index.js" />
     <Content Include="cfg\config.default.json" />
     <Content Include="cfg\config.json" />
-    <Compile Include="stop-it\CoreUtils.js" />
-    <Compile Include="stop-it\Events.js" />
-    <Compile Include="stop-it\Init.js" />
-    <Compile Include="stop-it\PluginManager.js" />
-    <Compile Include="stop-it\Stop-it.js" />
-    <Compile Include="stop-it\Plugins\Tags.js" />
-    <Compile Include="stop-it\Types\Plugin.js" />
+    <Compile Include="Lexi\CoreUtils.js" />
+    <Compile Include="Lexi\Events.js" />
+    <Compile Include="Lexi\Init.js" />
+    <Compile Include="Lexi\PluginManager.js" />
+    <Compile Include="Lexi\Lexi.js" />
+    <Compile Include="Lexi\Plugins\Tags.js" />
+    <Compile Include="Lexi\Types\Plugin.js" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="cfg" />
     <Folder Include="logs" />
-    <Folder Include="stop-it" />
-    <Folder Include="stop-it\Data" />
-    <Folder Include="stop-it\Plugins" />
-    <Folder Include="stop-it\Plugins\Tags" />
-    <Folder Include="stop-it\Types" />
+    <Folder Include="Lexi\" />
+    <Folder Include="Lexi\Data\" />
+    <Folder Include="Lexi\Plugins\" />
+    <Folder Include="Lexi\Plugins\Tags\" />
+    <Folder Include="Lexi\Types\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->
