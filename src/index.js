@@ -1,5 +1,10 @@
-// copyright 2017 hayden andreyka - technoguyfication(.com) <haydenandreyka@gmail.com>
-// all rights are implied under the absence of a formal open source software license
+/*
+	"Lexi" is a Discord Bot Client that is capable of loading and executing plugins.
+
+	This source code or application should have come with a LICENSE file with the MIT License inside.
+
+	Copyright (c) 2017 Hayden Andreyka
+*/
 
 global.AppInfo = {
 	Name: "Lexi",
