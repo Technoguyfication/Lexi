@@ -6,13 +6,6 @@
 	Copyright (c) 2017 Hayden Andreyka
 */
 
-global.AppInfo = {
-	Name: "Lexi",
-	Version: "1.0.0",
-	Author: "Hayden Andreyka <haydenandreyka@gmail.com>",
-	Url: "https://technoguyfication.com/"
-};
-
 try {
 	global.fs = require('fs');
 	global.util = require('util');
