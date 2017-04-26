@@ -45,7 +45,7 @@ new Promise((resolve, reject) => {
 		}, reject);
 	});
 }).then(() => {
-	return require('./Stop-it.js').botStart();
+	return require('./Lexi.js').botStart();
 }).catch(err => {
 	console.error(`Init error: ${err.stack}`);
 	exit(1);
