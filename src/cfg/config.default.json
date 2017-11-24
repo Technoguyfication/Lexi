@@ -17,7 +17,7 @@
 	},
 	"Logging": {
 		"Level": "info",
-		"Prefix": "stop-it-bot-",
+		"Prefix": "lexi-",
 		"DatePattern": "yyyy-M-d",
 		"Container": "logs",
 		"JSON": false
@@ -28,6 +28,6 @@
 			"User": "mydbuser",
 			"Password": "mypassword"
 		},
-		"Database": "stop-it"
+		"Database": "lexi"
 	}
 }

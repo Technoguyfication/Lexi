@@ -1,13 +1,10 @@
-// stop-it bot for discord - using discord.js
-// copyright 2017 hayden andreyka - technoguyfication(.com) <haydenandreyka@gmail.com>
-// all rights are implied under the absence of a formal open source software license
+/*
+	"Lexi" is a Discord Bot Client that is capable of loading and executing plugins.
 
-global.AppInfo = {
-	Name: "stop-it",
-	Version: "1.0.0",
-	Author: "Hayden Andreyka <haydenandreyka@gmail.com>",
-	Url: "https://technoguyfication.com/"
-};
+	This source code or application should have come with a LICENSE file with the MIT License inside.
+
+	Copyright (c) 2017 Hayden Andreyka
+*/
 
 try {
 	global.fs = require('fs');
@@ -21,9 +18,9 @@ try {
 	global.mysql = require('mysql');
 	global.Discord = require('discord.js');
 
-	global.Cache = require('./stop-it/Cache.js');
+	global.Cache = require('./Lexi/Cache.js');
 } catch (er) {
 	console.error(`Fatal error loading dependencies:\n\n${er.stack}`);
 	process.exit(1);
 }
-require('./stop-it/Init.js');
+require('./Lexi/Init.js');
